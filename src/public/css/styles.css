@@ -31,6 +31,12 @@ body {
 /**/
 
 /**/
+.menubar {
+	opacity: 0.75;
+}
+.menubar:hover {
+	opacity: 1;
+}
  #story-container {
 	position: relative;
 	height: 100%;
@@ -55,45 +61,6 @@ body {
 .text-item {
 	padding: 10px 0;
 	font-size: 40px;
-	line-height: 1em;
-	text-align: center;
-}
-/**/
-
-/* TODO REMOVE */
- .form-border {
-	border: 1px dashed hsl(0, 0%, 50%);
-	border-radius: 5px;
-	padding: 0 15px;
-}
-.video-container {
-	position: relative;
-	height: 400px;
-}
-.video-player {
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
-}
-.image-area {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 360px;
-	cursor: pointer;
-	text-align: center;
-	/*background-image: url('giraffe.gif');*/
-	/*background-repeat: no-repeat;*/
-	/*background-size: 100% 100%;*/
-}
-.image-area > img {
-	width: 100%;
-	height: 100%;
-}
-.video-item {
-	padding: 10px 0;
-	font-size: 50px;
 	line-height: 1em;
 	text-align: center;
 }

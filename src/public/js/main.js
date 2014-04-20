@@ -23,14 +23,15 @@
 					i: [{ // items
 						k: 't', // kind
 						t: 'HAHAHAH', // text
-						s: { // styles
+						l: { // layout
 							l: 300, // left
 							t: 100, // top
-						}
+						},
+						s: 70 // font size
 					}, {
 						k: 'i',
 						u: '/public/images/giraffe.gif', // url
-						s: {
+						l: {
 							l: 200,
 							t: 200,
 							w: 400,
@@ -39,14 +40,14 @@
 					}, {
 						k: 't',
 						t: 'YEAHHH',
-						s: {
+						l: {
 							l: 300,
 							t: 440,
 						}
 						/*}, {
 						k: 'y',
 						y: 'OprCOLuUPzY',
-						s: {
+						l: {
 							l: 0,
 							t: 500,
 							w: 400,
@@ -55,6 +56,13 @@
 					}]
 				}]
 			};
+
+
+
+			////////////////////////
+			// HASH DATA HANDLING //
+			////////////////////////
+
 
 			if ($location.hash()) {
 				$scope.hash_data = decode_hash($location.hash());
@@ -99,26 +107,11 @@
 				return obj;
 			}
 
-			$scope.edit_item_text = function(item) {
-				alertify.prompt('Write something inspiring:', function(e, str) {
-					if (e) {
-						item.t = str;
-						$scope.$apply();
-					}
-				}, item.t);
-			};
 
-			$scope.delete_item = function(item) {
-				alertify.confirm('Are you sure you want to delete?', function(e) {
-					if (e) {
-						var index = _.indexOf($scope.page.i, item);
-						if (index >= 0) {
-							$scope.page.i.splice(index, 1);
-							$scope.$apply();
-						}
-					}
-				});
-			};
+
+			////////////////////////
+			// DROP ZONE HANDLING //
+			////////////////////////
 
 
 			var story_container = document.getElementById('story-container');
@@ -133,21 +126,26 @@
 					// gets cleared once we complete the event
 					var kind = drop_item.kind;
 					var type = drop_item.type;
+					var count = 0;
 					if (kind === 'string') {
 						drop_item.getAsString(function(str) {
 							console.log('DROP', kind, type, str);
+							if (type !== 'text/uri-list') {
+								return;
+							}
 							var yt = parse_youtube_url(str);
 							if (yt) {
 								var item = {
 									k: 'y',
 									y: yt.videoId,
-									s: {
-										l: event.offsetX,
-										t: event.offsetY,
+									l: {
+										l: event.offsetX + (count * 20),
+										t: event.offsetY + (count * 20),
 										w: 400,
 										h: 300,
 									}
 								};
+								count++;
 								$scope.page.i.push(item);
 								$scope.$apply();
 							}
@@ -194,6 +192,39 @@
 				}
 			}
 
+
+			////////////////////////////
+			// ITEM EDITING FUNCTIONS //
+			////////////////////////////
+
+
+			$scope.edit_item_text = function(item) {
+				alertify.prompt('Write something inspiring:', function(e, str) {
+					if (e) {
+						item.t = str;
+						$scope.$apply();
+					}
+				}, item.t);
+			};
+			$scope.increase_font_size = function(item) {
+				var sz = item.s || 40;
+				item.s = sz + 5;
+			};
+			$scope.decrease_font_size = function(item) {
+				var sz = item.s || 40;
+				item.s = sz - 5;
+			};
+			$scope.delete_item = function(item) {
+				alertify.confirm('Are you sure you want to delete?', function(e) {
+					if (e) {
+						var index = _.indexOf($scope.page.i, item);
+						if (index >= 0) {
+							$scope.page.i.splice(index, 1);
+							$scope.$apply();
+						}
+					}
+				});
+			};
 
 			/*
 
@@ -263,7 +294,7 @@
 	hash_app.directive('ngEditLayout', function() {
 		return function(scope, elem, attr) {
 			var options = scope.$eval(attr.ngEditLayout);
-			var styles = options.s;
+			var styles = options.l;
 
 			function watch_style(key, css_key) {
 				scope.$watch(function() {
@@ -289,8 +320,8 @@
 				grid: [10, 10],
 				stop: function(event, ui) {
 					scope.$apply(function() {
-						styles.top = ui.position.top;
-						styles.left = ui.position.left;
+						styles.l = ui.position.left;
+						styles.t = ui.position.top;
 					});
 				}
 			});

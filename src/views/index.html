@@ -15,7 +15,7 @@
 	<div class="table-layout">
 
 		<div class="table-row">
-			<div class="container clearfix">
+			<div class="menubar container clearfix">
 				<div style="padding: 5px 0" class="pull-right">
 					<i class="serif">
 						# HashTube was designed by
@@ -23,9 +23,9 @@
 						#
 					</i>
 				</div>
-				<button class="btn btn-link" ng-click="editing=!editing">Edit</button>
+				<button class="btn btn-link btn-sm" ng-click="editing=!editing">Edit</button>
 				<!-- <button class="btn btn-link" ng-click="">+ Item</button> -->
-				<button class="btn btn-link" ng-click="share()">Share</button>
+				<button class="btn btn-link btn-sm" ng-click="share()">Share</button>
 				<!-- <a class="btn btn-link" href="/" target="_blank">New</a> -->
 				<div class="pad-1"></div>
 			</div>
@@ -119,7 +119,7 @@
 		<div class="table-row expand-height">
 			<div class="container expand-height">
 				<div id="story-container" class="expand-height" dropzone="link">
-					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{s: item.s, handle: '.story-item-header'}">
+					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, handle: '.story-item-header'}">
 						<div class="story-item-header clearfix" ng-show="editing">
 							<div class="btn-group pull-right">
 								<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" style="padding: 0 5px">
@@ -129,6 +129,12 @@
 									<li ng-if="item.k=='t'">
 										<a ng-click="edit_item_text(item)">Edit Text</a>
 									</li>
+									<li ng-if="item.k=='t'">
+										<a ng-click="increase_font_size(item)">+ Font Size</a>
+									</li>
+									<li ng-if="item.k=='t'">
+										<a ng-click="decrease_font_size(item)">- Font Size</a>
+									</li>
 									<li class="divider"></li>
 									<li>
 										<a ng-click="delete_item(item)">Delete</a>
@@ -137,7 +143,7 @@
 							</div>
 						</div>
 						<div class="story-item-content" ng-switch="item.k">
-							<div ng-switch-when="t" class="text-item">{{item.t}}</div>
+							<div ng-switch-when="t" class="text-item" ng-style="{fontSize: item.s}">{{item.t}}</div>
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
