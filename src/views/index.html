@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html ng-app="hash_app" xmlns:fb="http://ogp.me/ns/fb#" lang="en">
+
+<head>
+	<?# def.include( 'common_head.html') ?>
+</head>
+
+<body ng-controller="MainCtrl" ng-cloak ng-style="{color: fgcolor, borderColor: fgcolor, backgroundColor: bgcolor}">
+
+	<div>
+		<?# def.include( 'common_body.html') ?>
+	</div>
+
+
+	<div class="table-layout">
+
+		<div class="table-row">
+			<div class="container clearfix">
+				<div style="padding: 5px 0" class="pull-right">
+					<i class="serif">
+						# HashTube was designed by
+						<a href="https://www.noobaa.com" target="_blank">NooBaa</a>
+						#
+					</i>
+				</div>
+				<button class="btn btn-link" ng-click="editing=!editing">Edit</button>
+				<!-- <button class="btn btn-link" ng-click="">+ Item</button> -->
+				<button class="btn btn-link" ng-click="share()">Share</button>
+				<!-- <a class="btn btn-link" href="/" target="_blank">New</a> -->
+				<div class="pad-1"></div>
+			</div>
+		</div>
+
+		<div class="table-row">
+			<div ng-show="false && editing">
+				<div class="container">
+					<div class="pad-3"></div>
+					<div class="form-border" ng-style="{borderColor: fgcolor}">
+						<form novalidate class="form-horizontal" name="form">
+							<div class="pad-1"></div>
+							<div class="form-group clearfix">
+								<label class="col-sm-3 control-label">Paste Youtube URL:</label>
+								<div class="col-sm-9">
+									<input ng-model="video_url" name="video_url" type="url" class="form-control" required>
+								</div>
+							</div>
+							<div class="form-group clearfix">
+								<label class="col-sm-3 control-label">Start Time:</label>
+								<div class="col-sm-3">
+									<div class="input-group">
+										<input ng-model="input_start_time" name="input_start_time" type="text" class="form-control" required>
+										<div class="input-group-btn">
+											<button ng-click="set_start_time_from_current()" class="btn btn-default" title="Use current player time" rel="tooltip">
+												<i class="fa fa-clock-o"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+								<label class="col-sm-3 control-label">End Time:</label>
+								<div class="col-sm-3">
+									<div class="input-group">
+										<input ng-model="input_end_time" name="input_end_time" type="text" class="form-control" required>
+										<div class="input-group-btn">
+											<button ng-click="set_end_time_from_current()" class="btn btn-default" title="Use current player time" rel="tooltip">
+												<i class="fa fa-clock-o"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group clearfix">
+								<label class="col-sm-3 control-label">Headline:</label>
+								<div class="col-sm-9">
+									<input ng-model="headline" type="text" class="form-control">
+								</div>
+							</div>
+							<div class="form-group clearfix">
+								<label class="col-sm-3 control-label">Bottomline:</label>
+								<div class="col-sm-9">
+									<input ng-model="bottomline" type="text" class="form-control">
+								</div>
+							</div>
+							<div class="form-group clearfix">
+								<label class="col-sm-3 control-label">Text Color:</label>
+								<div class="col-sm-3">
+									<input ng-model="fgcolor" name="fgcolor" type="color" class="form-control">
+								</div>
+								<label class="col-sm-3 control-label">Background Color:</label>
+								<div class="col-sm-3">
+									<input ng-model="bgcolor" name="bgcolor" type="color" class="form-control">
+								</div>
+							</div>
+							<div class="form-group clearfix">
+								<div class="col-sm-offset-3 col-sm-9">
+									<button ng-click="play_video()" type="submit" class="btn btn-default" ng-disabled="form.$invalid">Preview</button>
+									<button ng-click="make_link()" type="submit" class="btn btn-default" ng-disabled="form.$invalid">Copy Link to clipboard</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="pad-1"></div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="table-row expand-height">
+			<div class="container expand-height">
+				<div class="story-container expand-height">
+					<div ng-repeat="item in items" class="story-item" ng-edit-layout="{s: item.s}">
+						<div class="story-item-header drag-handle clearfix" ng-show="editing">
+							<div class="btn-group pull-right">
+								<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" style="padding: 0 5px">
+									<i class="fa fa-cog"></i>
+								</button>
+								<ul class="dropdown-menu" role="menu">
+									<li ng-if="item.k=='t'">
+										<a ng-click="edit_item_text(item)">Edit Text</a>
+									</li>
+									<li class="divider"></li>
+									<li>
+										<a ng-click="delete_item(item)">Delete</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="story-item-content" ng-switch="item.k">
+							<div ng-switch-when="t" class="text-item">{{item.t}}</div>
+							<img ng-switch-when="i" ng-src="{{item.u}}" />
+							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
+							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
+							<div ng-switch-when="yt" class="yt-item" ng-src="{{item.u}}"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+
+	</div>
+
+
+
+	<div>
+		<?# def.include( 'common_scripts.html') ?>
+	</div>
+</body>
+
+</html>
