@@ -5,7 +5,7 @@
 	<?# def.include( 'common_head.html') ?>
 </head>
 
-<body ng-controller="MainCtrl" ng-cloak ng-style="{color: fgcolor, borderColor: fgcolor, backgroundColor: bgcolor}">
+<body ng-controller="MainCtrl" ng-cloak ng-style="{color: hash_data.fg, borderColor: hash_data.fg, backgroundColor: hash_data.bg}">
 
 	<div>
 		<?# def.include( 'common_body.html') ?>
@@ -32,10 +32,22 @@
 		</div>
 
 		<div class="table-row">
+			<div ng-show="editing">
+				<div class="container">
+					<div class="form-group clearfix text-center">
+						<label class="control-label">Text Color</label>
+						&nbsp;
+						<input ng-model="hash_data.fg" name="fgcolor" type="color" class="form-control" style="display: inline-block; width: 40px; padding: 0">&nbsp;&nbsp;
+						<label class="control-label">Background Color</label>
+						&nbsp;
+						<input ng-model="hash_data.bg" name="bgcolor" type="color" class="form-control" style="display: inline-block; width: 40px; padding: 0">
+					</div>
+				</div>
+			</div>
 			<div ng-show="false && editing">
 				<div class="container">
 					<div class="pad-3"></div>
-					<div class="form-border" ng-style="{borderColor: fgcolor}">
+					<div class="form-border" ng-style="{borderColor: hash_data.fg}">
 						<form novalidate class="form-horizontal" name="form">
 							<div class="pad-1"></div>
 							<div class="form-group clearfix">
@@ -107,7 +119,7 @@
 		<div class="table-row expand-height">
 			<div class="container expand-height">
 				<div class="story-container expand-height">
-					<div ng-repeat="item in items" class="story-item" ng-edit-layout="{s: item.s, handle: '.story-item-header'}">
+					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{s: item.s, handle: '.story-item-header'}">
 						<div class="story-item-header clearfix" ng-show="editing">
 							<div class="btn-group pull-right">
 								<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" style="padding: 0 5px">

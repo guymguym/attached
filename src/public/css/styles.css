@@ -3,6 +3,12 @@ html, body {
 	height: 100%;
 	max-height: 100%;
 }
+body {
+	transition: all 0.5s;
+	-o-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+}
 .container {
 	width: 1000px !important;
 }
@@ -135,6 +141,9 @@ a, a:hover, a:active, a:focus, .btn-link, .btn-link:hover, .btn-link:active, .bt
 	border-radius: 20px;
 	font-size: 14px;
 	max-width: 220px;
+}
+.alertify {
+	color: black;
 }
 /*
 	Allow angular.js to be loaded in body, hiding cloaked elements until 

@@ -16,59 +16,71 @@
 	hash_app.controller('MainCtrl', ['$scope', '$http', '$window', '$location', '$q', '$timeout', '$interval',
 		function($scope, $http, $window, $location, $q, $timeout, $interval) {
 
-			$scope.items = [{
-				k: 't',
-				t: 'HAHAHAH',
-				s: {
-					left: 300,
-					top: 100,
-				}
-			}, {
-				k: 'i',
-				u: '/public/images/giraffe.gif',
-				s: {
-					left: 200,
-					top: 200,
-					width: 400,
-					height: 200,
-				}
-			}, {
-				k: 't',
-				t: 'YEAHHH',
-				s: {
-					left: 300,
-					top: 440,
-				}
-			}, {
-				k: 't',
-				t: 'HAHAHAH',
-				s: {
-					left: 500,
-					top: 100,
-				}
-			}, {
-				k: 'i',
-				u: '/public/images/giraffe.gif',
-				s: {
-					left: 400,
-					top: 200,
-					width: 400,
-					height: 200,
-				}
-			}, {
-				k: 't',
-				t: 'YEAHHH',
-				s: {
-					left: 500,
-					top: 440,
-				}
-			}];
+			$scope.hash_data = {
+				bg: '#000000',
+				fg: '#aa00aa',
+				p: [{ // pages
+					i: [{ // items
+						k: 't', // kind
+						t: 'HAHAHAH', // text
+						s: { // styles
+							l: 300, // left
+							t: 100, // top
+						}
+					}, {
+						k: 'i',
+						u: '/public/images/giraffe.gif', // url
+						s: {
+							l: 200,
+							t: 200,
+							w: 400,
+							h: 200,
+						}
+					}, {
+						k: 't',
+						t: 'YEAHHH',
+						s: {
+							l: 300,
+							t: 440,
+						}
+					}, {
+						k: 't',
+						t: 'HAHAHAH',
+						s: {
+							l: 500,
+							t: 100,
+						}
+					}, {
+						k: 'i',
+						u: '/public/images/giraffe.gif',
+						s: {
+							l: 400,
+							t: 200,
+							w: 400,
+							h: 200,
+						}
+					}, {
+						k: 't',
+						t: 'YEAHHH',
+						s: {
+							l: 500,
+							t: 440,
+						}
+					}]
+				}]
+			};
 
 			if ($location.hash()) {
-				$scope.items = decode_hash($location.hash());
+				$scope.hash_data = decode_hash($location.hash());
 			}
 
-			$scope.$watch('items', update_url_hash, true /*deep equality check*/ );
+			$scope.page_index = 0;
+			$scope.$watch('page_index', function() {
+				$scope.page = $scope.hash_data.p[$scope.page_index];
+			});
+
+
+			$scope.$watch('hash_data', update_url_hash, true /*deep equality check*/ );
 
 			function update_url_hash() {
 				// ignore first watch because we just read the hash
@@ -82,7 +94,7 @@
 			}
 
 			function _update_url_hash() {
-				$location.hash(encode_hash($scope.items));
+				$location.hash(encode_hash($scope.hash_data));
 			}
 
 			function encode_hash(obj) {
@@ -111,9 +123,9 @@
 			$scope.delete_item = function(item) {
 				alertify.confirm('Are you sure you want to delete?', function(e) {
 					if (e) {
-						var index = _.indexOf($scope.items, item);
+						var index = _.indexOf($scope.page.i, item);
 						if (index >= 0) {
-							$scope.items.splice(index, 1);
+							$scope.page.i.splice(index, 1);
 							$scope.$apply();
 						}
 					}
@@ -326,21 +338,21 @@
 			var options = scope.$eval(attr.ngEditLayout);
 			var styles = options.s;
 
-			function watch_style(key) {
+			function watch_style(key, css_key) {
 				scope.$watch(function() {
 					return styles[key];
 				}, function() {
 					// console.log('WATCH', key, '=', styles[key]);
 					var suffix = typeof(styles[key]) === 'number' ? 'px' : '';
-					elem.css(key, styles[key] + suffix);
+					elem.css(css_key, styles[key] + suffix);
 				});
 			}
-			watch_style('left');
-			watch_style('top');
-			watch_style('right');
-			watch_style('bottom');
-			watch_style('width');
-			watch_style('height');
+			watch_style('l', 'left');
+			watch_style('t', 'top');
+			watch_style('r', 'right');
+			watch_style('b', 'bottom');
+			watch_style('w', 'width');
+			watch_style('h', 'height');
 
 			elem.draggable({
 				containment: 'parent',
@@ -453,8 +465,8 @@
 
 	// LZW Compression/Decompression for Strings
 	// from http://rosettacode.org/wiki/LZW_compression#JavaScript
-	// Unused because it generates arrays of integers, 
-	// which requires more work to encode to base64, so using lz-string library instead.
+	// We use the lz-string library instead because this code encodes to integers (not chars), 
+	// which requires more work to encode to base64.
 	/*
 	function LZW_compress(uncompressed) {
 		"use strict";
