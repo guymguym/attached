@@ -31,7 +31,7 @@ body {
 /**/
 
 /**/
- .story-container {
+ #story-container {
 	position: relative;
 	height: 100%;
 }

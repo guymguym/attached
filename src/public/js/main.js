@@ -13,8 +13,8 @@
 		// 'ngAnimate',
 	]);
 
-	hash_app.controller('MainCtrl', ['$scope', '$http', '$window', '$location', '$q', '$timeout', '$interval',
-		function($scope, $http, $window, $location, $q, $timeout, $interval) {
+	hash_app.controller('MainCtrl', ['$scope', '$http', '$window', '$location', '$q', '$timeout', '$interval', '$sce',
+		function($scope, $http, $window, $location, $q, $timeout, $interval, $sce) {
 
 			$scope.hash_data = {
 				bg: '#000000',
@@ -43,29 +43,15 @@
 							l: 300,
 							t: 440,
 						}
-					}, {
-						k: 't',
-						t: 'HAHAHAH',
+						/*}, {
+						k: 'y',
+						y: 'OprCOLuUPzY',
 						s: {
-							l: 500,
-							t: 100,
-						}
-					}, {
-						k: 'i',
-						u: '/public/images/giraffe.gif',
-						s: {
-							l: 400,
-							t: 200,
+							l: 0,
+							t: 500,
 							w: 400,
-							h: 200,
-						}
-					}, {
-						k: 't',
-						t: 'YEAHHH',
-						s: {
-							l: 500,
-							t: 440,
-						}
+							h: 300,
+						}*/
 					}]
 				}]
 			};
@@ -73,6 +59,8 @@
 			if ($location.hash()) {
 				$scope.hash_data = decode_hash($location.hash());
 			}
+
+			console.log('hash data', $scope.hash_data);
 
 			$scope.page_index = 0;
 			$scope.$watch('page_index', function() {
@@ -133,74 +121,49 @@
 			};
 
 
-			//////////
-			//////////
-			// TODO //
-			//////////
-			//////////
+			var story_container = document.getElementById('story-container');
+			// handling the drags events to allow drop on the element
+			story_container.addEventListener('dragenter', event_completed);
+			story_container.addEventListener('dragover', event_completed);
+			story_container.addEventListener('dragleave', event_completed);
+			story_container.addEventListener('drop', function(event) {
+				console.log('DROP', event);
+				_.each(event.dataTransfer.items, function(drop_item) {
+					// copy the info to our closure because the drop_item object 
+					// gets cleared once we complete the event
+					var kind = drop_item.kind;
+					var type = drop_item.type;
+					if (kind === 'string') {
+						drop_item.getAsString(function(str) {
+							console.log('DROP', kind, type, str);
+							var yt = parse_youtube_url(str);
+							if (yt) {
+								var item = {
+									k: 'y',
+									y: yt.videoId,
+									s: {
+										l: event.offsetX,
+										t: event.offsetY,
+										w: 400,
+										h: 300,
+									}
+								};
+								$scope.page.i.push(item);
+								$scope.$apply();
+							}
+						});
+					} else {
+						// kind === 'file'
+						console.log('DROP unsupported item kind', kind, type);
+					}
+				});
+				return event_completed(event);
+			});
 
 
-			var fields = [{
-				name: 'video_id',
-				short_name: 'v',
-				default_value: null,
-				// parse_form: parse_video_url_to_id,
-				// format_form: format_video_url_from_id,
-			}, {
-				name: 'start_time',
-				short_name: 't',
-				default_value: 0,
-				parse_form: parse_time,
-				format_form: format_time,
-			}, {
-				name: 'end_time',
-				short_name: 't',
-				default_value: 0, // TODO make it start+10
-				parse_form: parse_time,
-				format_form: format_time,
-			}, {
-				name: 'headline',
-				short_name: 'h',
-				default_value: '',
-			}, {
-				name: 'bottomline',
-				short_name: 'b',
-				default_value: '',
-			}, {
-				name: 'fgcolor',
-				short_name: 'fg',
-				default_value: null,
-			}, {
-				name: 'bgcolor',
-				short_name: 'bg',
-				default_value: null,
-			}];
-
-			var player;
-			var query = $location.search();
-			// console.log('QUERY', query);
-
-			$scope.video_id = query.v;
-			$scope.start_time = Number(query.t) || 0;
-			$scope.end_time = Number(query.e) || ($scope.start_time + 10);
-			$scope.headline = query.h;
-			$scope.bottomline = query.b;
-			$scope.fgcolor = query.fg;
-			$scope.bgcolor = query.bg;
-			// $scope.items = query.m ? JSON.parse(decodeURIComponent(query.m)) : [];
-
-			$scope.cover = cover;
-			$scope.make_link = make_link;
-			$scope.play_video = play_video;
-
-			$scope.video_url = $scope.video_id ? ('https://www.youtube.com/watch?v=' + $scope.video_id) : '';
-			$scope.input_start_time = format_time($scope.start_time);
-			$scope.input_end_time = format_time($scope.end_time);
-
-			$scope.$watch('video_id', play_video);
-			$scope.$watch('video_url', function(value) {
+			function parse_youtube_url(url) {
 				var parser = document.createElement('a');
-				parser.href = value;
+				parser.href = url;
 				var i, pair;
 				var search_query = {};
 				var search_vars = parser.search.substring(1).split('&');
@@ -214,20 +177,30 @@
 					pair = hash_vars[i].split('=');
 					hash_query[pair[0]] = decodeURIComponent(pair[1]);
 				}
+				var res = {};
 				if (parser.host === 'youtu.be') {
-					$scope.video_id = parser.pathname.substring(1);
+					res.videoId = parser.pathname.substring(1);
 					if (search_query.t) {
-						$scope.input_start_time =
-							search_query.t.replace('h', ':').replace('m', ':').replace('s', '');
+						var formatted_time = search_query.t.replace('h', ':').replace('m', ':').replace('s', '');
+						res.startSeconds = parse_time(formatted_time);
 					}
+					return res;
 				} else if (parser.host === 'www.youtube.com') {
-					$scope.video_id = search_query.v;
+					res.videoId = search_query.v;
 					if (hash_query.t) {
-						var time = parseInt(hash_query.t, 10);
-						$scope.input_start_time = format_time(time);
+						res.startSeconds = parseInt(hash_query.t, 10);
 					}
+					return res;
 				}
-			});
+			}
+
+
+			/*
+
+			$scope.video_url = $scope.video_id ? ('https://www.youtube.com/watch?v=' + $scope.video_id) : '';
+			$scope.input_start_time = format_time($scope.start_time);
+			$scope.input_end_time = format_time($scope.end_time);
+
 
 			$scope.$watch('input_start_time', function() {
 				$scope.start_time = parse_time($scope.input_start_time);
@@ -243,28 +216,6 @@
 				var current_time = Math.floor(player.getCurrentTime());
 				$scope.input_end_time = format_time(current_time);
 			};
-
-			load_youtube_iframe_api();
-
-			function cover() {
-				$scope.covering = !$scope.covering;
-				if ($scope.covering) {
-					player.mute();
-				} else {
-					player.unMute();
-				}
-			}
-
-			function make_link() {
-				$location.search('v', $scope.video_id);
-				$location.search('t', $scope.start_time);
-				$location.search('e', $scope.end_time);
-				$location.search('h', $scope.headline);
-				$location.search('b', $scope.bottomline);
-				$location.search('fg', $scope.fgcolor);
-				$location.search('bg', $scope.bgcolor);
-				// $location.search('m', encodeURIComponent(JSON.stringify($scope.items)));
-			}
 
 			function play_video() {
 				if (!player) {
@@ -294,30 +245,6 @@
 				}
 			}
 
-			function load_youtube_iframe_api() {
-				// callback when the youtube api loads 
-				window.onYouTubeIframeAPIReady = function() {
-					player = new YT.Player('player', {
-						height: '100%',
-						width: '100%',
-						events: {
-							onReady: function(event) {
-								play_video();
-							},
-							onStateChange: player_state_change
-						}
-					});
-				};
-				// loads the iframe_api code asynchronously
-				var tag = document.createElement('script');
-				tag.src = "https://www.youtube.com/iframe_api";
-				var first_script_tag = document.getElementsByTagName('script')[0];
-				first_script_tag.parentNode.insertBefore(tag, first_script_tag);
-			}
-
-
-
-			/*
 			function update_colors() {
 				var elem = document.getElementById('bgcolor_styles');
 				var styles = elem.sheet || elem.styleSheet;
@@ -369,6 +296,59 @@
 			});
 		};
 	});
+
+
+	hash_app.directive('ngYoutube', ['youtube_api_load_promise',
+		function(youtube_api_load_promise) {
+			return function(scope, elem, attr) {
+				var options = scope.$eval(attr.ngYoutube);
+				youtube_api_load_promise.then(function() {
+					var player = new YT.Player(elem[0], {
+						height: '100%',
+						width: '100%',
+						events: {
+							onReady: function(event) {
+								console.log('player_ready', event);
+								player.loadVideoById({
+									// mediaContentUrl: options.url,
+									videoId: options.id,
+									// startSeconds: $scope.start_time,
+									// endSeconds: $scope.end_time,
+								});
+							},
+							onStateChange: function(event) {
+								console.log('state change', event);
+							},
+							onPlaybackQualityChange: function(event) {
+								console.log('playback quality change', event);
+							},
+							onError: function(event) {
+								console.log('ERROR FROM YOUTUBE PLAYER', event);
+							}
+						}
+					});
+				});
+			};
+		}
+	]);
+
+
+	hash_app.factory('youtube_api_load_promise', ['$q',
+		function($q) {
+			var defer = $q.defer();
+			// callback when the youtube api loads 
+			window.onYouTubeIframeAPIReady = function() {
+				defer.resolve();
+			};
+			// loads the iframe_api code asynchronously
+			var tag = document.createElement('script');
+			tag.src = "https://www.youtube.com/iframe_api";
+			var first_script_tag = document.getElementsByTagName('script')[0];
+			first_script_tag.parentNode.insertBefore(tag, first_script_tag);
+			// the service returning a promise
+			return defer.promise;
+		}
+	]);
 
 	hash_app.run(function($rootScope) {
 		$rootScope.safe_apply = safe_apply;

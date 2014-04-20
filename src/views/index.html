@@ -104,8 +104,8 @@
 							</div>
 							<div class="form-group clearfix">
 								<div class="col-sm-offset-3 col-sm-9">
-									<button ng-click="play_video()" type="submit" class="btn btn-default" ng-disabled="form.$invalid">Preview</button>
-									<button ng-click="make_link()" type="submit" class="btn btn-default" ng-disabled="form.$invalid">Copy Link to clipboard</button>
+									<button ng-click="" type="submit" class="btn btn-default" ng-disabled="form.$invalid">Preview</button>
+									<button ng-click="" type="submit" class="btn btn-default" ng-disabled="form.$invalid">Copy Link to clipboard</button>
 								</div>
 							</div>
 						</form>
@@ -118,7 +118,7 @@
 
 		<div class="table-row expand-height">
 			<div class="container expand-height">
-				<div class="story-container expand-height">
+				<div id="story-container" class="expand-height" dropzone="link">
 					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{s: item.s, handle: '.story-item-header'}">
 						<div class="story-item-header clearfix" ng-show="editing">
 							<div class="btn-group pull-right">
@@ -141,7 +141,7 @@
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
-							<div ng-switch-when="yt" class="youtube-item" ng-src="{{item.u}}"></div>
+							<div ng-switch-when="y" class="youtube-item" ng-youtube="{id: item.y}"></div>
 						</div>
 					</div>
 				</div>
