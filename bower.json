@@ -1,0 +1,18 @@
+{
+	"name": "GamersMap",
+	"version": "0.0.1",
+	"dependencies": {
+		"alertify.js": "0.3.x"
+	},
+	"//": {
+		"bootstrap": "3.1.1",
+		"bootswatch": "3.1.1",
+		"font-awesome": "4.0.3",
+		"animate.css": "3.0.0",
+		"bootstrap-growl": "latest",
+		"chardin.js": "0.1.2",
+		"angular-ui": "0.4.0",
+		"ng-grid": "2.0.7",
+		"bootstrap": "http://getbootstrap.com/2.3.2/assets/bootstrap.zip"
+	}
+}

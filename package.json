@@ -1,0 +1,50 @@
+{
+	"name": "StoryHash",
+	"version": "0.0.1",
+	"private": true,
+	"engines": {
+		"node": "0.10.25",
+		"npm": "1.3.x"
+	},
+	"scripts": {
+		"postinstall": "./node_modules/.bin/grunt"
+	},
+	"dependencies": {
+		"express": "3.5.x",
+		"supervisor": "0.5.x",
+		"dot": "1.0.x",
+		"dot-emc": "0.1.x",
+		"grunt": "0.4.x",
+		"grunt-cli": "0.1.x",
+		"grunt-contrib-jshint": "0.10.x",
+		"bower": "1.3.x",
+		"async": "0.7.x",
+		"underscore": "1.6.x"
+	},
+	"//": {
+		"mongoose": "3.8.x",
+		"passport": "0.2.0",
+		"passport-http": "0.2.2",
+		"pickadate": "3.5.0",
+		"request": "2.34.0",
+		"underscore.string": "2.3.3",
+		"passport-facebook": "1.0.2",
+		"passport-google-oauth": "0.1.5",
+		"googleapis": "0.6.1",
+		"node-mandrill": "1.0.1",
+		"aws-sdk": "2.0.0-rc9",
+		"facebook-api": "0.1.2",
+		"q": "1.0.0",
+		"moment": "2.5.1",
+		"nodetime": "0.8.15",
+		"bowser": "0.3.7",
+		"mime": "1.2.11",
+		"mixpanel": "0.0.18",
+		"cloudfront-private-url-creator": "1.0.49",
+		"express-minify": "0.0.7",
+		"uglify-js": "2.4.12",
+		"grunt-contrib-concat": "0.3.0",
+		"grunt-contrib-uglify": "0.3.2",
+		"grunt-contrib-nodeunit": "0.3.0"
+	}
+}
