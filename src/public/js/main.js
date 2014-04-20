@@ -277,7 +277,7 @@
 				containment: 'parent',
 				cursor: 'move',
 				opacity: 0.5,
-				handle: '.drag-handle',
+				handle: options.handle,
 				grid: [10, 10],
 				stop: function(event, ui) {
 					scope.$apply(function() {

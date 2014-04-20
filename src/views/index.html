@@ -107,8 +107,8 @@
 		<div class="table-row expand-height">
 			<div class="container expand-height">
 				<div class="story-container expand-height">
-					<div ng-repeat="item in items" class="story-item" ng-edit-layout="{s: item.s}">
-						<div class="story-item-header drag-handle clearfix" ng-show="editing">
+					<div ng-repeat="item in items" class="story-item" ng-edit-layout="{s: item.s, handle: '.story-item-header'}">
+						<div class="story-item-header clearfix" ng-show="editing">
 							<div class="btn-group pull-right">
 								<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" style="padding: 0 5px">
 									<i class="fa fa-cog"></i>

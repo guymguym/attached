@@ -40,8 +40,6 @@ html, body {
 	border-radius: 10px;
 	border-style: dashed;
 	border-width: 1px;
-}
-.drag-handle {
 	cursor: move;
 }
 .text-item {
