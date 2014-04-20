@@ -25,7 +25,7 @@ html, body {
 /**/
 
 /**/
-.story-container {
+ .story-container {
 	position: relative;
 	height: 100%;
 }
@@ -42,9 +42,13 @@ html, body {
 	border-width: 1px;
 	cursor: move;
 }
+.story-item-content, .story-item-content img, .story-item-content audio, .story-item-content video, .story-item-content .youtube-item {
+	height: 100%;
+	width: 100%;
+}
 .text-item {
 	padding: 10px 0;
-	font-size: 50px;
+	font-size: 40px;
 	line-height: 1em;
 	text-align: center;
 }

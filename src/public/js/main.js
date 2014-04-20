@@ -20,17 +20,84 @@
 				k: 't',
 				t: 'HAHAHAH',
 				s: {
+					left: 300,
+					top: 100,
+				}
+			}, {
+				k: 'i',
+				u: '/public/images/giraffe.gif',
+				s: {
+					left: 200,
 					top: 200,
-					left: 400,
+					width: 400,
+					height: 200,
 				}
 			}, {
 				k: 't',
 				t: 'YEAHHH',
 				s: {
-					top: 500,
+					left: 300,
+					top: 440,
+				}
+			}, {
+				k: 't',
+				t: 'HAHAHAH',
+				s: {
+					left: 500,
+					top: 100,
+				}
+			}, {
+				k: 'i',
+				u: '/public/images/giraffe.gif',
+				s: {
 					left: 400,
+					top: 200,
+					width: 400,
+					height: 200,
+				}
+			}, {
+				k: 't',
+				t: 'YEAHHH',
+				s: {
+					left: 500,
+					top: 440,
 				}
 			}];
+
+			if ($location.hash()) {
+				$scope.items = decode_hash($location.hash());
+			}
+
+			$scope.$watch('items', update_url_hash, true /*deep equality check*/ );
+
+			function update_url_hash() {
+				// ignore first watch because we just read the hash
+				if (!$scope.ignored_first_update_hash) {
+					$scope.ignored_first_update_hash = true;
+					return;
+				}
+				// throttle down
+				$timeout.cancel($scope.update_url_hash_timeout);
+				$timeout(_update_url_hash, 250);
+			}
+
+			function _update_url_hash() {
+				$location.hash(encode_hash($scope.items));
+			}
+
+			function encode_hash(obj) {
+				var json = angular.toJson(obj);
+				var hash = LZString.compressToBase64(json);
+				console.log('ENCODE HASH', json.length, '->', hash.length);
+				return hash;
+			}
+
+			function decode_hash(hash) {
+				var json = LZString.decompressFromBase64(hash);
+				var obj = angular.fromJson(json);
+				console.log('DECODE HASH', hash.length, '->', json.length);
+				return obj;
+			}
 
 			$scope.edit_item_text = function(item) {
 				alertify.prompt('Write something inspiring:', function(e, str) {
@@ -99,7 +166,7 @@
 
 			var player;
 			var query = $location.search();
-			console.log('QUERY', query);
+			// console.log('QUERY', query);
 
 			$scope.video_id = query.v;
 			$scope.start_time = Number(query.t) || 0;
@@ -110,7 +177,6 @@
 			$scope.bgcolor = query.bg;
 			// $scope.items = query.m ? JSON.parse(decodeURIComponent(query.m)) : [];
 
-			$scope.editing = !$scope.video_id;
 			$scope.cover = cover;
 			$scope.make_link = make_link;
 			$scope.play_video = play_video;
@@ -260,18 +326,21 @@
 			var options = scope.$eval(attr.ngEditLayout);
 			var styles = options.s;
 
-			function watch_style(key, suffix) {
+			function watch_style(key) {
 				scope.$watch(function() {
 					return styles[key];
 				}, function() {
-					console.log('WATCH', key, '=', styles[key]);
+					// console.log('WATCH', key, '=', styles[key]);
+					var suffix = typeof(styles[key]) === 'number' ? 'px' : '';
 					elem.css(key, styles[key] + suffix);
 				});
 			}
-			watch_style('left', 'px');
-			watch_style('top', 'px');
-			watch_style('right', 'px');
-			watch_style('bottom', 'px');
+			watch_style('left');
+			watch_style('top');
+			watch_style('right');
+			watch_style('bottom');
+			watch_style('width');
+			watch_style('height');
 
 			elem.draggable({
 				containment: 'parent',
@@ -307,7 +376,7 @@
 	});
 
 	hash_app.config(function($routeProvider, $locationProvider) {
-		$locationProvider.html5Mode(true);
+		// $locationProvider.html5Mode(true);
 	});
 
 
@@ -379,5 +448,87 @@
 		}
 	}
 
+
+
+
+	// LZW Compression/Decompression for Strings
+	// from http://rosettacode.org/wiki/LZW_compression#JavaScript
+	// Unused because it generates arrays of integers, 
+	// which requires more work to encode to base64, so using lz-string library instead.
+	/*
+	function LZW_compress(uncompressed) {
+		"use strict";
+		// Build the dictionary.
+		var i,
+			dictionary = {},
+			c,
+			wc,
+			w = "",
+			result = [],
+			dictSize = 256;
+		for (i = 0; i < 256; i += 1) {
+			dictionary[String.fromCharCode(i)] = i;
+		}
+
+		for (i = 0; i < uncompressed.length; i += 1) {
+			c = uncompressed.charAt(i);
+			wc = w + c;
+			//Do not use dictionary[wc] because javascript arrays 
+			//will return values for array['pop'], array['push'] etc
+			// if (dictionary[wc]) {
+			if (dictionary.hasOwnProperty(wc)) {
+				w = wc;
+			} else {
+				result.push(dictionary[w]);
+				// Add wc to the dictionary.
+				dictionary[wc] = dictSize++;
+				w = String(c);
+			}
+		}
+
+		// Output the code for w.
+		if (w !== "") {
+			result.push(dictionary[w]);
+		}
+		return result;
+	}
+	function LZW_decompress(compressed) {
+		"use strict";
+		// Build the dictionary.
+		var i,
+			dictionary = [],
+			w,
+			result,
+			k,
+			entry = "",
+			dictSize = 256;
+		for (i = 0; i < 256; i += 1) {
+			dictionary[i] = String.fromCharCode(i);
+		}
+
+		w = String.fromCharCode(compressed[0]);
+		result = w;
+		for (i = 1; i < compressed.length; i += 1) {
+			k = compressed[i];
+			if (dictionary[k]) {
+				entry = dictionary[k];
+			} else {
+				if (k === dictSize) {
+					entry = w + w.charAt(0);
+				} else {
+					return null;
+				}
+			}
+
+			result += entry;
+
+			// Add w+entry[0] to the dictionary.
+			dictionary[dictSize++] = w + entry.charAt(0);
+
+			w = entry;
+		}
+		return result;
+	}
+	*/
 
 })();
