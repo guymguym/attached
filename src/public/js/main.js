@@ -135,12 +135,14 @@
 							}
 							var yt = parse_youtube_url(str);
 							if (yt) {
+								var left = event.offsetX + (count * 20);
+								var top = event.offsetY + (count * 20);
 								var item = {
 									k: 'y',
 									y: yt.videoId,
 									l: {
-										l: event.offsetX + (count * 20),
-										t: event.offsetY + (count * 20),
+										l: left,
+										t: top,
 										w: 400,
 										h: 300,
 									}
@@ -206,22 +208,29 @@
 					}
 				}, item.t);
 			};
-			$scope.increase_font_size = function(item) {
+			$scope.increase_font_size = function(item, event) {
+				event.stopPropagation();
 				var sz = item.s || 40;
 				item.s = sz + 5;
 			};
-			$scope.decrease_font_size = function(item) {
+			$scope.decrease_font_size = function(item, event) {
+				event.stopPropagation();
 				var sz = item.s || 40;
 				item.s = sz - 5;
 			};
-			$scope.delete_item = function(item) {
+			$scope.send_to_front = function(item, index, event) {
+				$scope.page.i.splice(index, 1);
+				$scope.page.i.push(item);
+			};
+			$scope.send_to_back = function(item, index, event) {
+				$scope.page.i.splice(index, 1);
+				$scope.page.i.unshift(item);
+			};
+			$scope.delete_item = function(item, index) {
 				alertify.confirm('Are you sure you want to delete?', function(e) {
 					if (e) {
-						var index = _.indexOf($scope.page.i, item);
-						if (index >= 0) {
-							$scope.page.i.splice(index, 1);
-							$scope.$apply();
-						}
+						$scope.page.i.splice(index, 1);
+						$scope.$apply();
 					}
 				});
 			};
@@ -295,29 +304,37 @@
 		return function(scope, elem, attr) {
 			var options = scope.$eval(attr.ngEditLayout);
 			var styles = options.l;
+			var PXGRID = 15;
 
-			function watch_style(key, css_key) {
+			function watch_style(key, css_key, pxgrid) {
 				scope.$watch(function() {
 					return styles[key];
 				}, function() {
 					// console.log('WATCH', key, '=', styles[key]);
-					var suffix = typeof(styles[key]) === 'number' ? 'px' : '';
-					elem.css(css_key, styles[key] + suffix);
+					if (pxgrid && typeof(styles[key]) === 'number') {
+						var x = Math.floor(styles[key]);
+						x = x < 0 ? 0 : x;
+						x -= x % pxgrid;
+						elem.css(css_key, x + 'px');
+					} else {
+						elem.css(css_key, styles[key]);
+					}
 				});
 			}
-			watch_style('l', 'left');
-			watch_style('t', 'top');
-			watch_style('r', 'right');
-			watch_style('b', 'bottom');
-			watch_style('w', 'width');
-			watch_style('h', 'height');
+			watch_style('l', 'left', PXGRID);
+			watch_style('t', 'top', PXGRID);
+			watch_style('r', 'right', PXGRID);
+			watch_style('b', 'bottom', PXGRID);
+			watch_style('w', 'width', PXGRID);
+			watch_style('h', 'height', PXGRID);
 
 			elem.draggable({
 				containment: 'parent',
 				cursor: 'move',
 				opacity: 0.5,
 				handle: options.handle,
-				grid: [10, 10],
+				grid: [PXGRID, PXGRID],
+				iframeFix: true,
 				stop: function(event, ui) {
 					scope.$apply(function() {
 						styles.l = ui.position.left;
@@ -333,18 +350,34 @@
 		function(youtube_api_load_promise) {
 			return function(scope, elem, attr) {
 				var options = scope.$eval(attr.ngYoutube);
+				var data = elem.data('ngYoutube');
+				if (data) {
+					console.log('ngYoutube DOUBLE INIT', data);
+					return;
+				}
+				console.log('ngYoutube');
+				data = {};
 				youtube_api_load_promise.then(function() {
-					var player = new YT.Player(elem[0], {
+					var player = data.player = new YT.Player(elem[0], {
 						height: '100%',
 						width: '100%',
+						playerVars: {
+							iv_load_policy: 3, // hide video annotations
+							rel: 0, // hide suggested related videos
+							showinfo: 0, // hide title and uploader info
+							theme: 'light',
+							// wmode: 'opaque', // doesnt do anything
+						},
 						events: {
 							onReady: function(event) {
-								console.log('player_ready', event);
-								player.loadVideoById({
-									// mediaContentUrl: options.url,
+								console.log('player_ready', event, data.loaded ? 'reload' : '');
+								data.loaded = true;
+								// player.loadVideoById({
+								player.cueVideoById({
 									videoId: options.id,
 									// startSeconds: $scope.start_time,
 									// endSeconds: $scope.end_time,
+									// mediaContentUrl: options.url,
 								});
 							},
 							onStateChange: function(event) {
@@ -358,6 +391,7 @@
 							}
 						}
 					});
+					elem.data('ngYoutube', data);
 				});
 			};
 		}

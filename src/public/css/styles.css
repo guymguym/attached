@@ -54,6 +54,20 @@ body {
 	border-width: 1px;
 	cursor: move;
 }
+.story-item-cover {
+	opacity: 0.75;
+	/*border-radius: 10px;*/
+	border-style: dashed;
+	border-width: 1px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+.story-item-content {
+	position: relative;
+}
 .story-item-content, .story-item-content img, .story-item-content audio, .story-item-content video, .story-item-content .youtube-item {
 	height: 100%;
 	width: 100%;
