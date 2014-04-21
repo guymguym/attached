@@ -135,10 +135,10 @@
 					var count = 0;
 					if (kind === 'string') {
 						drop_item.getAsString(function(str) {
+							console.log('DROP', kind, type, str);
 							if (type !== 'text/uri-list') {
 								return;
 							}
-							console.log('DROP', kind, type, str);
 							var left = event.offsetX + (count * 20);
 							var top = event.offsetY + (count * 20);
 							var yt = parse_youtube_url(str);
@@ -158,9 +158,34 @@
 								$scope.safe_apply();
 								return;
 							}
+							// check if url is image
+							$('<img>', {
+								src: str,
+								width: 1,
+								height: 1,
+								load: function() {
+									var item = {
+										k: 'i',
+										u: str,
+										l: {
+											l: left,
+											t: top,
+											w: 200,
+										}
+									};
+									count++;
+									$scope.page.i.push(item);
+									$scope.safe_apply();
+								},
+								error: function() {
+									alertify.log('Unable to create item from URL. Try with image or youtube.');
+								},
+							});
+							/*
 							$http({
 								method: 'HEAD',
 								url: str,
+								withCredentials: true,
 								headers: {
 									'Access-Control-Allow-Origin': '*',
 									'Access-Control-Allow-Methods': 'HEAD',
@@ -188,6 +213,7 @@
 									// TODO handle video/audio
 								}
 							});
+							*/
 						});
 					} else {
 						// kind === 'file'
@@ -445,29 +471,33 @@
 	/////////////
 
 
-	app.run(function($rootScope) {
-		$rootScope.safe_apply = safe_apply;
-		$rootScope.safe_callback = safe_callback;
-		jQuery.fn.focusWithoutScrolling = function() {
-			var x = window.scrollX;
-			var y = window.scrollY;
-			this.focus();
-			window.scrollTo(x, y);
-		};
-		/* 
-		using directive ng-tip instead
-		$('body').tooltip({
-			selector: '[rel=tooltip]',
-		});
-		*/
-		$('body').popover({
-			selector: '[rel=popover]',
-		});
-	});
+	app.run(['$rootScope',
+		function($rootScope) {
+			$rootScope.safe_apply = safe_apply;
+			$rootScope.safe_callback = safe_callback;
+			jQuery.fn.focusWithoutScrolling = function() {
+				var x = window.scrollX;
+				var y = window.scrollY;
+				this.focus();
+				window.scrollTo(x, y);
+			};
+			/* 
+			using directive ng-tip instead
+			$('body').tooltip({
+				selector: '[rel=tooltip]',
+			});
+			*/
+			$('body').popover({
+				selector: '[rel=popover]',
+			});
+		}
+	]);
 
-	app.config(function($routeProvider, $locationProvider) {
-		// $locationProvider.html5Mode(true);
-	});
+	app.config(['$routeProvider', '$locationProvider', '$httpProvider',
+		function($routeProvider, $locationProvider, $httpProvider) {
+			// $locationProvider.html5Mode(true);
+		}
+	]);
 
 
 	function safe_apply(func) {
