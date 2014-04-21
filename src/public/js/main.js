@@ -60,35 +60,42 @@
 			// HASH DATA HANDLING //
 			////////////////////////
 
-
-			if ($location.hash()) {
-				$scope.attached = decode_hash($location.hash());
-			} else {
+			$scope.$location = $location;
+			if (!$location.hash()) {
 				$scope.editing = true;
 			}
-
-			console.log('hash data', $scope.attached);
-
-			$scope.page_index = 0;
-			$scope.$watch('page_index', function() {
-				$scope.page = $scope.attached.p[$scope.page_index];
-			});
-
-
-			$scope.$watch('attached', update_url_hash, true /*deep equality check*/ );
-
-			function update_url_hash() {
-				// ignore first watch because we just read the hash
-				if (!$scope.ignored_first_update_hash) {
-					$scope.ignored_first_update_hash = true;
+			$scope.$watch('$location.hash()', function(hash_value) {
+				// ignore watches when we just modified the hash
+				if ($scope.ignore_hash_update) {
+					console.log('hash change ignored');
+					$scope.ignore_hash_update = false;
 					return;
 				}
+				$scope.ignore_attached_update = true;
+				$scope.attached = decode_hash(hash_value);
+				$scope.page = $scope.attached.p[$scope.page_index];
+				console.log('hash data', $scope.attached);
+			});
+			$scope.$watch('page_index', function() {
+				console.log('page', $scope.page_index);
+				$scope.page = $scope.attached.p[$scope.page_index];
+			});
+			$scope.$watch('attached', update_url_hash, true /*deep equality check*/ );
+			$scope.page_index = 0; // triggers page watch too
+
+			function update_url_hash() {
 				// throttle down
 				$timeout.cancel($scope.update_url_hash_timeout);
 				$timeout(_update_url_hash, 250);
 			}
 
 			function _update_url_hash() {
+				// ignore watches when we just modified the attached data
+				if ($scope.ignore_attached_update) {
+					$scope.ignore_attached_update = false;
+					return;
+				}
+				$scope.ignore_hash_update = true;
 				$location.hash(encode_hash($scope.attached));
 			}
 
@@ -337,9 +344,6 @@
 
 			elem.resizable({
 				containment: 'parent',
-				handles: {
-					se: elem.find(options.resizer), // TODO doesn't work.
-				},
 				grid: [PXGRID, PXGRID],
 				stop: function(event, ui) {
 					scope.safe_apply(function() {

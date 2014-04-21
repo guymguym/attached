@@ -15,7 +15,7 @@
 	<div class="table-layout">
 
 		<div class="table-row">
-			<div class="menubar container clearfix">
+			<div class="menubar container clearfix fadeIn">
 				<div style="padding: 5px 0" class="pull-right">
 					<i class="serif">
 						<!-- <img src="/public/images/ampbw.png" width="15" height="15" style="vertical-align: middle"></img> -->
@@ -36,14 +36,18 @@
 
 		<div class="table-row">
 			<div ng-show="editing">
-				<div class="container">
-					<div class="form-group clearfix text-center">
-						<label class="control-label">Text Color</label>
-						&nbsp;
-						<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control" style="display: inline-block; width: 40px; padding: 0">&nbsp;&nbsp;
-						<label class="control-label">Background Color</label>
-						&nbsp;
-						<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control" style="display: inline-block; width: 40px; padding: 0">
+				<div class="container fadeIn">
+					<div class="clearfix text-center">
+						<button ng-click="" class="btn btn-default">+ Text</button>
+						<button ng-click="" class="btn btn-default">+ URL</button>
+						<button ng-click="" class="btn btn-default">+ File</button>
+						<span>Colors</span>&nbsp;
+						<div style="display: inline-block">
+						<div class="input-group">
+							<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
+							<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
+						</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -53,7 +57,7 @@
 		<div class="table-row expand-height">
 			<div class="container expand-height">
 				<div id="story-container" class="expand-height" dropzone="link">
-					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, mover: '.story-item-header', resizer: '.story-item-resizer'}" ng-init="ytdata={}">
+					<div ng-repeat="item in page.i" class="story-item {{editing && 'edit-story-item'}}" ng-edit-layout="{l: item.l, mover: '.story-item-header', resizer: '.story-item-resizer'}" ng-init="ytdata={}">
 						<div class="story-item-header clearfix" ng-show="editing" ng-style="{backgroundColor: attached.bg}">
 							<span ng-if="item.k=='t'">
 								<button ng-click="edit_item_text(item)" class="btn btn-link" title="Edit text" ng-tip>
@@ -131,13 +135,11 @@
 						</div>
 						<div class="story-item-content" ng-switch="item.k">
 							<div ng-if="editing" class="story-item-cover" ng-style="{backgroundColor: attached.bg}"></div>
-							<div ng-switch-when="t" class="text-item" ng-style="{fontSize: item.s}">{{item.t}}</div>
+							<div ng-switch-when="t" class="text-item serif" ng-style="{fontSize: item.s}">{{item.t}}</div>
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
 							<div ng-switch-when="y" class="youtube-item" ng-youtube="{ytdata: ytdata, id: item.y, start: item.s, end: item.e, pause: item.p}"></div>
-							<div ng-if="editing" class="story-item-resizer ui-resizable-handle ui-resizable-se"><i class="fa fa-dot-circle-o"></i>
-							</div>
 						</div>
 					</div>
 				</div>

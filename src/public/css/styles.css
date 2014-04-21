@@ -48,15 +48,13 @@ body {
 	top: 0;
 	left: 0;
 }
-.story-item-resizer {
-	position: absolute;
-	bottom: -15px;
-	right: -10px;
-	font-size: inherit;
-	width: auto;
-	height: auto;
+.story-item:not(.edit-story-item) .ui-resizable-handle {
+	display: none !important;
 }
 .story-item-header {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
 	border-radius: 10px;
 	border-style: solid;
 	border-width: 1px;
@@ -78,8 +76,11 @@ body {
 }
 .story-item-content {
 	position: relative;
+	padding: 10px;
+	height: 100%;
+	width: 100%;
 }
-.story-item-content, .story-item-content img, .story-item-content audio, .story-item-content video, .story-item-content .youtube-item {
+.story-item-content img, .story-item-content audio, .story-item-content video, .story-item-content .youtube-item {
 	position: relative;
 	height: 100%;
 	width: 100%;
