@@ -25,7 +25,7 @@
 				</div>
 				<button class="btn btn-link btn-sm" ng-click="editing=!editing">Edit</button>
 				<!-- <button class="btn btn-link" ng-click="">+ Item</button> -->
-				<button class="btn btn-link btn-sm" ng-click="share()">Share</button>
+				<!-- <button class="btn btn-link btn-sm" ng-click="share()">Share</button> -->
 				<!-- <a class="btn btn-link" href="/" target="_blank">New</a> -->
 				<div class="pad-1"></div>
 			</div>
@@ -44,85 +44,52 @@
 					</div>
 				</div>
 			</div>
-			<div ng-show="false && editing">
-				<div class="container">
-					<div class="pad-3"></div>
-					<div class="form-border" ng-style="{borderColor: hash_data.fg}">
-						<form novalidate class="form-horizontal" name="form">
-							<div class="pad-1"></div>
-							<div class="form-group clearfix">
-								<label class="col-sm-3 control-label">Paste Youtube URL:</label>
-								<div class="col-sm-9">
-									<input ng-model="video_url" name="video_url" type="url" class="form-control" required>
-								</div>
-							</div>
-							<div class="form-group clearfix">
-								<label class="col-sm-3 control-label">Start Time:</label>
-								<div class="col-sm-3">
-									<div class="input-group">
-										<input ng-model="input_start_time" name="input_start_time" type="text" class="form-control" required>
-										<div class="input-group-btn">
-											<button ng-click="set_start_time_from_current()" class="btn btn-default" title="Use current player time" rel="tooltip">
-												<i class="fa fa-clock-o"></i>
-											</button>
-										</div>
-									</div>
-								</div>
-								<label class="col-sm-3 control-label">End Time:</label>
-								<div class="col-sm-3">
-									<div class="input-group">
-										<input ng-model="input_end_time" name="input_end_time" type="text" class="form-control" required>
-										<div class="input-group-btn">
-											<button ng-click="set_end_time_from_current()" class="btn btn-default" title="Use current player time" rel="tooltip">
-												<i class="fa fa-clock-o"></i>
-											</button>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="form-group clearfix">
-								<label class="col-sm-3 control-label">Headline:</label>
-								<div class="col-sm-9">
-									<input ng-model="headline" type="text" class="form-control">
-								</div>
-							</div>
-							<div class="form-group clearfix">
-								<label class="col-sm-3 control-label">Bottomline:</label>
-								<div class="col-sm-9">
-									<input ng-model="bottomline" type="text" class="form-control">
-								</div>
-							</div>
-							<div class="form-group clearfix">
-								<label class="col-sm-3 control-label">Text Color:</label>
-								<div class="col-sm-3">
-									<input ng-model="fgcolor" name="fgcolor" type="color" class="form-control">
-								</div>
-								<label class="col-sm-3 control-label">Background Color:</label>
-								<div class="col-sm-3">
-									<input ng-model="bgcolor" name="bgcolor" type="color" class="form-control">
-								</div>
-							</div>
-							<div class="form-group clearfix">
-								<div class="col-sm-offset-3 col-sm-9">
-									<button ng-click="" type="submit" class="btn btn-default" ng-disabled="form.$invalid">Preview</button>
-									<button ng-click="" type="submit" class="btn btn-default" ng-disabled="form.$invalid">Copy Link to clipboard</button>
-								</div>
-							</div>
-						</form>
-					</div>
-					<div class="pad-1"></div>
-				</div>
-			</div>
 		</div>
 
 
 		<div class="table-row expand-height">
 			<div class="container expand-height">
 				<div id="story-container" class="expand-height" dropzone="link">
-					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, handle: '.story-item-header'}">
+					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, handle: '.story-item-header'}" ng-init="ytdata={}">
 						<div class="story-item-header clearfix" ng-show="editing" ng-style="{backgroundColor: hash_data.bg}">
-							<div class="btn-group pull-right">
-								<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown" style="padding: 0 5px">
+							<span class="btn btn-link" title="Move around" ng-tip>
+								<i class="fa fa-arrows"></i>
+							</span>
+							<span ng-if="item.k=='t'">
+								<button ng-click="edit_item_text(item)" class="btn btn-link" title="Edit text" ng-tip>
+									<i class="fa fa-pencil"></i>
+								</button>
+								<button ng-click="increase_font_size(item, $event)" class="btn btn-link" title="Increase font size" ng-tip>
+									<i class="fa fa-plus"></i>
+								</button>
+								<button ng-click="decrease_font_size(item, $event)" class="btn btn-link" title="Decrease font size" ng-tip>
+									<i class="fa fa-minus"></i>
+								</button>
+							</span>
+							<span ng-if="item.k=='y'">
+								<button ng-click="set_yt_start_time(item, ytdata)" class="btn btn-link" title="Set start time as current player time" ng-tip>
+									[{{(item.s || 0) | format_time}}
+								</button>
+								-
+								<button ng-click="set_yt_end_time(item, ytdata)" class="btn btn-link" title="Set end time as current player time" ng-tip>
+									{{(item.e || ytdata.duration) | format_time}}]
+								</button>
+								<button ng-click="toggle_pause(item)" class="btn btn-link" title="Set auto pause/play on load" ng-tip>
+									<i class="fa fa-{{item.p && 'pause' || 'play'}}"></i>
+								</button>
+							</span>
+							<button ng-click="send_to_front(item, $index, $event)" class="btn btn-link" title="Send to Front" ng-tip>
+								<i class="fa fa-arrow-up"></i>
+							</button>
+							<button ng-click="send_to_back(item, $index, $event)" class="btn btn-link" title="Send to Back" ng-tip>
+								<i class="fa fa-arrow-down"></i>
+							</button>
+							<button ng-click="delete_item(item, $index, $event)" class="btn btn-link" title="Delete" ng-tip>
+								<i class="fa fa-trash-o"></i>
+							</button>
+							<!-- 
+							<div class="btn-group Xpull-right">
+								<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
 									<i class="fa fa-cog"></i>
 								</button>
 								<ul class="dropdown-menu" role="menu" style="z-index: 10000">
@@ -134,6 +101,15 @@
 									</li>
 									<li ng-if="item.k=='t'">
 										<a ng-click="decrease_font_size(item, $event)">- Font Size</a>
+									</li>
+									<li ng-if="item.k=='y'">
+										<a ng-click="toggle_pause(item)">Turn auto play {{item.p && 'on' || 'off'}}</a>
+									</li>
+									<li ng-if="item.k=='y'">
+										<a ng-click="set_yt_start_time(item, ytdata)">Set start time as current player time</a>
+									</li>
+									<li ng-if="item.k=='y'">
+										<a ng-click="set_yt_end_time(item, ytdata)">Set end time as current player time</a>
 									</li>
 									<li class="divider"></li>
 									<li>
@@ -148,14 +124,15 @@
 									</li>
 								</ul>
 							</div>
+							 -->
 						</div>
 						<div class="story-item-content" ng-switch="item.k">
+							<div ng-if="editing" class="story-item-cover" ng-style="{backgroundColor: hash_data.bg}"></div>
 							<div ng-switch-when="t" class="text-item" ng-style="{fontSize: item.s}">{{item.t}}</div>
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
-							<div ng-switch-when="y" class="youtube-item" ng-youtube="{id: item.y}"></div>
-							<div ng-if="editing" class="story-item-cover" ng-style="{backgroundColor: hash_data.bg}"></div>
+							<div ng-switch-when="y" class="youtube-item" ng-youtube="{ytdata: ytdata, id: item.y, start: item.s, end: item.e, pause: item.p}"></div>
 						</div>
 					</div>
 				</div>

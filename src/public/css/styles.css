@@ -50,14 +50,17 @@ body {
 }
 .story-item-header {
 	border-radius: 10px;
-	border-style: dashed;
+	border-style: groove;
 	border-width: 1px;
 	cursor: move;
 }
+.story-item-header .btn-link {
+	padding: 0 7px;
+}
 .story-item-cover {
-	opacity: 0.75;
+	opacity: 0.95;
 	/*border-radius: 10px;*/
-	border-style: dashed;
+	border-style: groove;
 	border-width: 1px;
 	position: absolute;
 	left: 0;
@@ -69,14 +72,15 @@ body {
 	position: relative;
 }
 .story-item-content, .story-item-content img, .story-item-content audio, .story-item-content video, .story-item-content .youtube-item {
+	position: relative;
 	height: 100%;
 	width: 100%;
 }
 .text-item {
+	position: relative;
 	padding: 10px 0;
 	font-size: 40px;
 	line-height: 1em;
-	text-align: center;
 }
 /**/
 
@@ -118,9 +122,8 @@ a, a:hover, a:active, a:focus, .btn-link, .btn-link:hover, .btn-link:active, .bt
 	opacity: 1 !important;
 }
 .tooltip-inner {
-	padding: 20px;
-	border-radius: 20px;
-	font-size: 14px;
+	padding: 5px 10px;
+	font-size: 15px;
 	max-width: 220px;
 }
 .alertify {

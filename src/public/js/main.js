@@ -17,32 +17,25 @@
 		function($scope, $http, $window, $location, $q, $timeout, $interval, $sce) {
 
 			$scope.hash_data = {
-				bg: '#000000',
-				fg: '#aa00aa',
+				bg: '#282828',
+				fg: '#ffff00',
 				p: [{ // pages
 					i: [{ // items
 						k: 't', // kind
-						t: 'HAHAHAH', // text
+						t: 'Tell your story...', // text
 						l: { // layout
 							l: 300, // left
-							t: 100, // top
+							t: 50, // top
 						},
-						s: 70 // font size
+						s: 50 // font size
 					}, {
 						k: 'i',
 						u: '/public/images/giraffe.gif', // url
 						l: {
-							l: 200,
+							l: 300,
 							t: 200,
 							w: 400,
 							h: 200,
-						}
-					}, {
-						k: 't',
-						t: 'YEAHHH',
-						l: {
-							l: 300,
-							t: 440,
 						}
 						/*}, {
 						k: 'y',
@@ -52,7 +45,11 @@
 							t: 500,
 							w: 400,
 							h: 300,
-						}*/
+						},
+						s: 12, // start seconds
+						e: 12, // end seconds
+						p: 1, // pause
+						*/
 					}]
 				}]
 			};
@@ -66,6 +63,8 @@
 
 			if ($location.hash()) {
 				$scope.hash_data = decode_hash($location.hash());
+			} else {
+				$scope.editing = true;
 			}
 
 			console.log('hash data', $scope.hash_data);
@@ -149,7 +148,7 @@
 								};
 								count++;
 								$scope.page.i.push(item);
-								$scope.$apply();
+								$scope.safe_apply();
 							}
 						});
 					} else {
@@ -204,7 +203,7 @@
 				alertify.prompt('Write something inspiring:', function(e, str) {
 					if (e) {
 						item.t = str;
-						$scope.$apply();
+						$scope.safe_apply();
 					}
 				}, item.t);
 			};
@@ -212,11 +211,25 @@
 				event.stopPropagation();
 				var sz = item.s || 40;
 				item.s = sz + 5;
+				return event_completed(event);
 			};
 			$scope.decrease_font_size = function(item, event) {
-				event.stopPropagation();
 				var sz = item.s || 40;
 				item.s = sz - 5;
+				return event_completed(event);
+			};
+			$scope.toggle_pause = function(item) {
+				if (item.p) {
+					delete item.p;
+				} else {
+					item.p = 1;
+				}
+			};
+			$scope.set_yt_start_time = function(item, ytdata) {
+				item.s = Math.floor(ytdata.player.getCurrentTime());
+			};
+			$scope.set_yt_end_time = function(item, ytdata) {
+				item.e = Math.floor(ytdata.player.getCurrentTime());
 			};
 			$scope.send_to_front = function(item, index, event) {
 				$scope.page.i.splice(index, 1);
@@ -226,13 +239,15 @@
 				$scope.page.i.splice(index, 1);
 				$scope.page.i.unshift(item);
 			};
-			$scope.delete_item = function(item, index) {
+			$scope.delete_item = function(item, index, event) {
 				alertify.confirm('Are you sure you want to delete?', function(e) {
 					if (e) {
-						$scope.page.i.splice(index, 1);
-						$scope.$apply();
+						$scope.safe_apply(function() {
+							$scope.page.i.splice(index, 1);
+						});
 					}
 				});
+				return event_completed(event);
 			};
 
 			/*
@@ -248,14 +263,6 @@
 			$scope.$watch('input_end_time', function() {
 				$scope.end_time = parse_time($scope.input_end_time);
 			});
-			$scope.set_start_time_from_current = function() {
-				var current_time = Math.floor(player.getCurrentTime());
-				$scope.input_start_time = format_time(current_time);
-			};
-			$scope.set_end_time_from_current = function() {
-				var current_time = Math.floor(player.getCurrentTime());
-				$scope.input_end_time = format_time(current_time);
-			};
 
 			function play_video() {
 				if (!player) {
@@ -331,12 +338,12 @@
 			elem.draggable({
 				containment: 'parent',
 				cursor: 'move',
-				opacity: 0.5,
+				opacity: 0.7,
 				handle: options.handle,
 				grid: [PXGRID, PXGRID],
 				iframeFix: true,
 				stop: function(event, ui) {
-					scope.$apply(function() {
+					scope.safe_apply(function() {
 						styles.l = ui.position.left;
 						styles.t = ui.position.top;
 					});
@@ -346,17 +353,16 @@
 	});
 
 
-	hash_app.directive('ngYoutube', ['youtube_api_load_promise',
-		function(youtube_api_load_promise) {
+	hash_app.directive('ngYoutube', ['youtube_api_load_promise', '$rootScope',
+		function(youtube_api_load_promise, $rootScope) {
 			return function(scope, elem, attr) {
 				var options = scope.$eval(attr.ngYoutube);
-				var data = elem.data('ngYoutube');
-				if (data) {
-					console.log('ngYoutube DOUBLE INIT', data);
+				var data = options.ytdata;
+				if (!_.isEmpty(data)) {
+					console.log('ngYoutube DOUBLE INIT', options);
 					return;
 				}
 				console.log('ngYoutube');
-				data = {};
 				youtube_api_load_promise.then(function() {
 					var player = data.player = new YT.Player(elem[0], {
 						height: '100%',
@@ -372,16 +378,23 @@
 							onReady: function(event) {
 								console.log('player_ready', event, data.loaded ? 'reload' : '');
 								data.loaded = true;
-								// player.loadVideoById({
-								player.cueVideoById({
+								var args = {
 									videoId: options.id,
-									// startSeconds: $scope.start_time,
-									// endSeconds: $scope.end_time,
-									// mediaContentUrl: options.url,
-								});
+									startSeconds: options.start,
+									endSeconds: options.end,
+								};
+								if (options.pause) {
+									player.cueVideoById(args);
+								} else {
+									player.loadVideoById(args);
+								}
 							},
 							onStateChange: function(event) {
 								console.log('state change', event);
+								if (!data.duration && event.data === YT.PlayerState.PLAYING) {
+									data.duration = player.getDuration();
+									$rootScope.safe_apply();
+								}
 							},
 							onPlaybackQualityChange: function(event) {
 								console.log('playback quality change', event);
@@ -391,7 +404,6 @@
 							}
 						}
 					});
-					elem.data('ngYoutube', data);
 				});
 			};
 		}
@@ -424,11 +436,14 @@
 			this.focus();
 			window.scrollTo(x, y);
 		};
+		/* 
+		using directive ng-tip instead
 		$('body').tooltip({
-			selector: '[rel=tooltip]'
+			selector: '[rel=tooltip]',
 		});
+		*/
 		$('body').popover({
-			selector: '[rel=popover]'
+			selector: '[rel=popover]',
 		});
 	});
 
@@ -477,7 +492,14 @@
 		return false;
 	}
 
+	hash_app.filter('format_time', function() {
+		return format_time;
+	});
+
 	function format_time(time) {
+		if (!time) {
+			return '';
+		}
 		var t = time;
 		var h = Math.floor(t / 3600);
 		t = t % 3600;
@@ -505,6 +527,16 @@
 		}
 	}
 
+	hash_app.directive('ngTip', function() {
+		return function(scope, elem, attr) {
+			elem.tooltip({
+				container: 'body'
+			});
+			elem.on('remove', function() {
+				elem.tooltip('destroy');
+			});
+		};
+	});
 
 
 
