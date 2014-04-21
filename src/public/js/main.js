@@ -128,14 +128,14 @@
 					var count = 0;
 					if (kind === 'string') {
 						drop_item.getAsString(function(str) {
-							console.log('DROP', kind, type, str);
 							if (type !== 'text/uri-list') {
 								return;
 							}
+							console.log('DROP', kind, type, str);
+							var left = event.offsetX + (count * 20);
+							var top = event.offsetY + (count * 20);
 							var yt = parse_youtube_url(str);
 							if (yt) {
-								var left = event.offsetX + (count * 20);
-								var top = event.offsetY + (count * 20);
 								var item = {
 									k: 'y',
 									y: yt.videoId,
@@ -149,7 +149,38 @@
 								count++;
 								$scope.page.i.push(item);
 								$scope.safe_apply();
+								return;
 							}
+							$http({
+								method: 'HEAD',
+								url: str,
+								headers: {
+									'Access-Control-Allow-Origin': '*',
+									'Access-Control-Allow-Methods': 'HEAD',
+									'Access-Control-Allow-Headers': 'Content-Type, X-Requested-With',
+									'X-Random-Shit': '123123123'
+								}
+							}).then(function(res) {
+								var content_type = res.headers('content-type');
+								console.log('HEAD', content_type);
+								var kind = content_type.split('/')[0];
+								if (kind === 'image') {
+									var item = {
+										k: 'i',
+										u: str,
+										l: {
+											l: left,
+											t: top,
+										}
+									};
+									count++;
+									$scope.page.i.push(item);
+									$scope.safe_apply();
+									return;
+								} else {
+									// TODO handle video/audio
+								}
+							});
 						});
 					} else {
 						// kind === 'file'
@@ -250,62 +281,16 @@
 				return event_completed(event);
 			};
 
-			/*
-
-			$scope.video_url = $scope.video_id ? ('https://www.youtube.com/watch?v=' + $scope.video_id) : '';
-			$scope.input_start_time = format_time($scope.start_time);
-			$scope.input_end_time = format_time($scope.end_time);
-
-
-			$scope.$watch('input_start_time', function() {
-				$scope.start_time = parse_time($scope.input_start_time);
-			});
-			$scope.$watch('input_end_time', function() {
-				$scope.end_time = parse_time($scope.input_end_time);
-			});
-
-			function play_video() {
-				if (!player) {
-					return;
-				}
-				console.log('player_ready', event);
-				player.loadVideoById({
-					videoId: $scope.video_id,
-					startSeconds: $scope.start_time,
-					endSeconds: $scope.end_time,
-				});
-				player.pauseVideo();
-			}
-
-			function player_state_change(event) {
-				if (event.data == YT.PlayerState.PLAYING) {
-					$interval.cancel($scope.state_interval);
-					$scope.state_interval = $interval(function() {
-						var current_time = Math.floor(player.getCurrentTime());
-						if (current_time === $scope.end_time) {
-							player.pauseVideo();
-						}
-					}, 300);
-				} else {
-					$interval.cancel($scope.state_interval);
-					$scope.state_interval = null;
-				}
-			}
-
-			function update_colors() {
-				var elem = document.getElementById('bgcolor_styles');
-				var styles = elem.sheet || elem.styleSheet;
-				for (var i = 0; i < styles.cssRules.length; i++) {
-					var rule = styles.cssRules[i];
-					rule.cssRules[0].style.setProperty('background-color', $scope.bgcolor);
-					rule.cssRules[1].style.setProperty('background-color', $scope.bgcolor2);
-					rule.cssRules[2].style.setProperty('background-color', $scope.bgcolor);
-					console.log('STYLE RULE', rule);
-				}
-			}
-			*/
 		}
 	]);
+
+
+
+
+	/////////////////
+	// EDIT LAYOUT //
+	/////////////////
+
 
 	hash_app.directive('ngEditLayout', function() {
 		return function(scope, elem, attr) {
@@ -339,7 +324,7 @@
 				containment: 'parent',
 				cursor: 'move',
 				opacity: 0.7,
-				handle: options.handle,
+				handle: options.mover,
 				grid: [PXGRID, PXGRID],
 				iframeFix: true,
 				stop: function(event, ui) {
@@ -349,8 +334,28 @@
 					});
 				}
 			});
+
+			elem.resizable({
+				containment: 'parent',
+				handles: {
+					se: elem.find(options.resizer), // TODO doesn't work.
+				},
+				grid: [PXGRID, PXGRID],
+				stop: function(event, ui) {
+					scope.safe_apply(function() {
+						styles.w = ui.size.width;
+						styles.h = ui.size.height;
+					});
+				}
+			});
 		};
 	});
+
+
+
+	/////////////
+	// YOUTUBE //
+	/////////////
 
 
 	hash_app.directive('ngYoutube', ['youtube_api_load_promise', '$rootScope',
@@ -426,6 +431,15 @@
 			return defer.promise;
 		}
 	]);
+
+
+
+
+
+	/////////////
+	// GENERAL //
+	/////////////
+
 
 	hash_app.run(function($rootScope) {
 		$rootScope.safe_apply = safe_apply;

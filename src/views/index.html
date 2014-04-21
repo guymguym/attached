@@ -50,11 +50,8 @@
 		<div class="table-row expand-height">
 			<div class="container expand-height">
 				<div id="story-container" class="expand-height" dropzone="link">
-					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, handle: '.story-item-header'}" ng-init="ytdata={}">
+					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, mover: '.story-item-header', resizer: '.story-item-resizer'}" ng-init="ytdata={}">
 						<div class="story-item-header clearfix" ng-show="editing" ng-style="{backgroundColor: hash_data.bg}">
-							<span class="btn btn-link" title="Move around" ng-tip>
-								<i class="fa fa-arrows"></i>
-							</span>
 							<span ng-if="item.k=='t'">
 								<button ng-click="edit_item_text(item)" class="btn btn-link" title="Edit text" ng-tip>
 									<i class="fa fa-pencil"></i>
@@ -87,6 +84,9 @@
 							<button ng-click="delete_item(item, $index, $event)" class="btn btn-link" title="Delete" ng-tip>
 								<i class="fa fa-trash-o"></i>
 							</button>
+							<span class="btn btn-link" title="Move around" ng-tip>
+								<i class="fa fa-arrows"></i>
+							</span>
 							<!-- 
 							<div class="btn-group Xpull-right">
 								<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
@@ -133,6 +133,7 @@
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
 							<div ng-switch-when="y" class="youtube-item" ng-youtube="{ytdata: ytdata, id: item.y, start: item.s, end: item.e, pause: item.p}"></div>
+							<div ng-if="editing" class="story-item-resizer ui-resizable-handle ui-resizable-se"><i class="fa fa-dot-circle-o"></i></div>
 						</div>
 					</div>
 				</div>
