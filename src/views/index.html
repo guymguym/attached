@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html ng-app="hash_app" xmlns:fb="http://ogp.me/ns/fb#" lang="en">
+<html ng-app="attached_app" xmlns:fb="http://ogp.me/ns/fb#" lang="en">
 
 <head>
 	<?# def.include( 'common_head.html') ?>
 </head>
 
-<body ng-controller="MainCtrl" ng-cloak ng-style="{color: hash_data.fg, borderColor: hash_data.fg, backgroundColor: hash_data.bg}">
+<body ng-controller="MainCtrl" ng-cloak ng-style="{color: attached.fg, borderColor: attached.fg, backgroundColor: attached.bg}">
 
 	<div>
 		<?# def.include( 'common_body.html') ?>
@@ -18,9 +18,12 @@
 			<div class="menubar container clearfix">
 				<div style="padding: 5px 0" class="pull-right">
 					<i class="serif">
-						# HashTube was designed by
+						<!-- <img src="/public/images/ampbw.png" width="15" height="15" style="vertical-align: middle"></img> -->
+						~
+						<a href="http://attached.io" target="_blank">attached.io</a>
+						was designed by
 						<a href="https://www.noobaa.com" target="_blank">NooBaa</a>
-						#
+						~
 					</i>
 				</div>
 				<button class="btn btn-link btn-sm" ng-click="editing=!editing">Edit</button>
@@ -37,10 +40,10 @@
 					<div class="form-group clearfix text-center">
 						<label class="control-label">Text Color</label>
 						&nbsp;
-						<input ng-model="hash_data.fg" name="fgcolor" type="color" class="form-control" style="display: inline-block; width: 40px; padding: 0">&nbsp;&nbsp;
+						<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control" style="display: inline-block; width: 40px; padding: 0">&nbsp;&nbsp;
 						<label class="control-label">Background Color</label>
 						&nbsp;
-						<input ng-model="hash_data.bg" name="bgcolor" type="color" class="form-control" style="display: inline-block; width: 40px; padding: 0">
+						<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control" style="display: inline-block; width: 40px; padding: 0">
 					</div>
 				</div>
 			</div>
@@ -51,7 +54,7 @@
 			<div class="container expand-height">
 				<div id="story-container" class="expand-height" dropzone="link">
 					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, mover: '.story-item-header', resizer: '.story-item-resizer'}" ng-init="ytdata={}">
-						<div class="story-item-header clearfix" ng-show="editing" ng-style="{backgroundColor: hash_data.bg}">
+						<div class="story-item-header clearfix" ng-show="editing" ng-style="{backgroundColor: attached.bg}">
 							<span ng-if="item.k=='t'">
 								<button ng-click="edit_item_text(item)" class="btn btn-link" title="Edit text" ng-tip>
 									<i class="fa fa-pencil"></i>
@@ -127,13 +130,14 @@
 							 -->
 						</div>
 						<div class="story-item-content" ng-switch="item.k">
-							<div ng-if="editing" class="story-item-cover" ng-style="{backgroundColor: hash_data.bg}"></div>
+							<div ng-if="editing" class="story-item-cover" ng-style="{backgroundColor: attached.bg}"></div>
 							<div ng-switch-when="t" class="text-item" ng-style="{fontSize: item.s}">{{item.t}}</div>
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
 							<div ng-switch-when="y" class="youtube-item" ng-youtube="{ytdata: ytdata, id: item.y, start: item.s, end: item.e, pause: item.p}"></div>
-							<div ng-if="editing" class="story-item-resizer ui-resizable-handle ui-resizable-se"><i class="fa fa-dot-circle-o"></i></div>
+							<div ng-if="editing" class="story-item-resizer ui-resizable-handle ui-resizable-se"><i class="fa fa-dot-circle-o"></i>
+							</div>
 						</div>
 					</div>
 				</div>

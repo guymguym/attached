@@ -89,7 +89,7 @@ passport.deserializeUser(function(user_data, done) {
 
 // configure app middleware handlers in the order to use them
 
-app.use(express.favicon('/public/images/logo.png'));
+app.use(express.favicon('/public/images/ampbw.png'));
 app.use(express.logger());
 app.use(function(req, res, next) {
 	// HTTPS redirect:
@@ -108,7 +108,7 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieSession({
 	// no need for secret since its signed by cookieParser
-	key: 'hashtube_session',
+	key: 'attached_session',
 	cookie: {
 		// TODO: setting max-age for all sessions although we prefer only for /auth.html
 		// but express/connect seems broken to accept individual session maxAge,

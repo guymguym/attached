@@ -6,17 +6,17 @@
 	'use strict';
 
 	// create our module
-	var hash_app = angular.module('hash_app', [
+	var app = angular.module('attached_app', [
 		'ngRoute',
 		// 'ngTouch',
 		// 'ngSanitize',
 		// 'ngAnimate',
 	]);
 
-	hash_app.controller('MainCtrl', ['$scope', '$http', '$window', '$location', '$q', '$timeout', '$interval', '$sce',
+	app.controller('MainCtrl', ['$scope', '$http', '$window', '$location', '$q', '$timeout', '$interval', '$sce',
 		function($scope, $http, $window, $location, $q, $timeout, $interval, $sce) {
 
-			$scope.hash_data = {
+			$scope.attached = {
 				bg: '#282828',
 				fg: '#ffff00',
 				p: [{ // pages
@@ -62,20 +62,20 @@
 
 
 			if ($location.hash()) {
-				$scope.hash_data = decode_hash($location.hash());
+				$scope.attached = decode_hash($location.hash());
 			} else {
 				$scope.editing = true;
 			}
 
-			console.log('hash data', $scope.hash_data);
+			console.log('hash data', $scope.attached);
 
 			$scope.page_index = 0;
 			$scope.$watch('page_index', function() {
-				$scope.page = $scope.hash_data.p[$scope.page_index];
+				$scope.page = $scope.attached.p[$scope.page_index];
 			});
 
 
-			$scope.$watch('hash_data', update_url_hash, true /*deep equality check*/ );
+			$scope.$watch('attached', update_url_hash, true /*deep equality check*/ );
 
 			function update_url_hash() {
 				// ignore first watch because we just read the hash
@@ -89,7 +89,7 @@
 			}
 
 			function _update_url_hash() {
-				$location.hash(encode_hash($scope.hash_data));
+				$location.hash(encode_hash($scope.attached));
 			}
 
 			function encode_hash(obj) {
@@ -292,7 +292,7 @@
 	/////////////////
 
 
-	hash_app.directive('ngEditLayout', function() {
+	app.directive('ngEditLayout', function() {
 		return function(scope, elem, attr) {
 			var options = scope.$eval(attr.ngEditLayout);
 			var styles = options.l;
@@ -358,7 +358,7 @@
 	/////////////
 
 
-	hash_app.directive('ngYoutube', ['youtube_api_load_promise', '$rootScope',
+	app.directive('ngYoutube', ['youtube_api_load_promise', '$rootScope',
 		function(youtube_api_load_promise, $rootScope) {
 			return function(scope, elem, attr) {
 				var options = scope.$eval(attr.ngYoutube);
@@ -415,7 +415,7 @@
 	]);
 
 
-	hash_app.factory('youtube_api_load_promise', ['$q',
+	app.factory('youtube_api_load_promise', ['$q',
 		function($q) {
 			var defer = $q.defer();
 			// callback when the youtube api loads 
@@ -441,7 +441,7 @@
 	/////////////
 
 
-	hash_app.run(function($rootScope) {
+	app.run(function($rootScope) {
 		$rootScope.safe_apply = safe_apply;
 		$rootScope.safe_callback = safe_callback;
 		jQuery.fn.focusWithoutScrolling = function() {
@@ -461,7 +461,7 @@
 		});
 	});
 
-	hash_app.config(function($routeProvider, $locationProvider) {
+	app.config(function($routeProvider, $locationProvider) {
 		// $locationProvider.html5Mode(true);
 	});
 
@@ -506,7 +506,7 @@
 		return false;
 	}
 
-	hash_app.filter('format_time', function() {
+	app.filter('format_time', function() {
 		return format_time;
 	});
 
@@ -541,7 +541,7 @@
 		}
 	}
 
-	hash_app.directive('ngTip', function() {
+	app.directive('ngTip', function() {
 		return function(scope, elem, attr) {
 			elem.tooltip({
 				container: 'body'
