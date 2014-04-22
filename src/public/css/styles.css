@@ -61,13 +61,13 @@ body {
 	bottom: 100%;
 	left: 0;
 	right: 0;
-	border-radius: 10px;
-	border-style: solid;
-	border-width: 1px;
+	/*border-radius: 10px;*/
+	/*border-style: solid;*/
+	/*border-width: 1px;*/
 	cursor: move;
 }
 .story-item-header .btn-link {
-	padding: 0 7px;
+	padding: 0 10px;
 }
 .story-item-cover {
 	opacity: 0.95;

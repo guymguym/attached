@@ -61,7 +61,8 @@
 			<div class="container expand-height">
 				<div id="story-container" class="expand-height clearfix" dropzone="link">
 					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, mover: '.story-item-header', resizer: '.story-item-resizer'}" ng-init="ytdata={}">
-						<div class="story-item-header show-on-edit-mode clearfix" ng-style="{backgroundColor: attached.bg}">
+						<div class="story-item-header show-on-edit-mode clearfix" ng-style="{backgroundColor: attached.fg, color: attached.bg}">
+							<!-- 
 							<span ng-if="item.k=='t'">
 								<button ng-click="edit_item_text(item)" class="btn btn-link" title="Edit text" ng-tip>
 									<i class="fa fa-pencil"></i>
@@ -94,10 +95,10 @@
 							<span class="btn btn-link" title="Move around" ng-tip>
 								<i class="fa fa-arrows"></i>
 							</span>
-							<!-- 
-							<div class="btn-group Xpull-right">
+							 -->
+							<div class="btn-group pull-right">
 								<button type="button" class="btn btn-link dropdown-toggle" data-toggle="dropdown">
-									<i class="fa fa-cog"></i>
+									<i class="fa fa-bars"></i>
 								</button>
 								<ul class="dropdown-menu" role="menu" style="z-index: 10000">
 									<li ng-if="item.k=='t'">
@@ -109,6 +110,7 @@
 									<li ng-if="item.k=='t'">
 										<a ng-click="decrease_font_size(item, $event)">- Font Size</a>
 									</li>
+									<li ng-if="item.k=='t'" class="divider"></li>
 									<li ng-if="item.k=='y'">
 										<a ng-click="toggle_pause(item)">Turn auto play {{item.p && 'on' || 'off'}}</a>
 									</li>
@@ -118,7 +120,7 @@
 									<li ng-if="item.k=='y'">
 										<a ng-click="set_yt_end_time(item, ytdata)">Set end time as current player time</a>
 									</li>
-									<li class="divider"></li>
+									<li ng-if="item.k=='y'" class="divider"></li>
 									<li>
 										<a ng-click="send_to_front(item, $index, $event)">Send to Front</a>
 									</li>
@@ -127,11 +129,10 @@
 									</li>
 									<li class="divider"></li>
 									<li>
-										<a ng-click="delete_item(item, $index)">Delete</a>
+										<a ng-click="delete_item(item, $index, $event)">Delete</a>
 									</li>
 								</ul>
 							</div>
-							 -->
 						</div>
 						<div class="story-item-content" ng-switch="item.k">
 							<div class="story-item-cover show-on-edit-mode" ng-style="{backgroundColor: attached.bg}"></div>
