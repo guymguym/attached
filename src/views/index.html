@@ -141,7 +141,7 @@
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
-							<div ng-switch-when="y" class="youtube-item" ng-youtube="{ytdata: ytdata, id: item.y, start: item.s, end: item.e, pause: item.p}"></div>
+							<div ng-switch-when="y" class="youtube-item" ng-youtube="{id: item.y, start: item.s, end: item.e, reload: !editing}" ng-youtube-data="ytdata"></div>
 						</div>
 					</div>
 				</div>

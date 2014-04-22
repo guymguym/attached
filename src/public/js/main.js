@@ -383,28 +383,33 @@
 	app.directive('ngYoutube', ['youtube_api_load_promise', '$rootScope',
 		function(youtube_api_load_promise, $rootScope) {
 			return function(scope, elem, attr) {
-				var options = scope.$eval(attr.ngYoutube);
-				var data = options.ytdata;
-				if (!_.isEmpty(data)) {
-					console.log('ngYoutube DOUBLE INIT', options);
-					return;
-				}
-				console.log('ngYoutube');
-				var play_btn = $('<div class="table-layout text-center" ' +
-					'style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer">' +
-					'<div class="table-row expand-height"></div>' +
-					'<div class="table-row"><i class="fa fa-youtube-play fa-4x"></i></div>' +
-					'<div class="table-row expand-height"></div></div>')
-					.on('click', load_player);
-				elem.empty().append($('<img>', {
-					src: 'https://img.youtube.com/vi/' + options.id + '/0.jpg',
-					width: '100%',
-					height: '100%'
-				})).append(play_btn);
+				var data = scope.$eval(attr.ngYoutubeData);
+				scope.$watch(attr.ngYoutube, reload, true /*deep*/ );
 
-				function load_player() {
+				function reload(options) {
+					console.log('ngYoutube', options);
+					data.options = options;
+					if (data.player) {
+						data.player.destroy();
+					}
+					data.loaded = false;
+					data.player = null;
+					var play_btn = $('<div class="table-layout text-center" ' +
+						'style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer">' +
+						'<div class="table-row expand-height"></div>' +
+						'<div class="table-row"><i class="fa fa-youtube-play fa-4x"></i></div>' +
+						'<div class="table-row expand-height"></div></div>')
+						.on('click', play);
+					elem.empty().append($('<img>', {
+						src: 'https://img.youtube.com/vi/' + options.id + '/0.jpg',
+						width: '100%',
+						height: '100%'
+					})).append(play_btn);
+				}
+
+				function play() {
 					youtube_api_load_promise.then(function() {
-						var player = data.player = new YT.Player(elem[0], {
+						data.player = new YT.Player(elem[0], {
 							height: '100%',
 							width: '100%',
 							playerVars: {
@@ -417,22 +422,20 @@
 							events: {
 								onReady: function(event) {
 									console.log('player_ready', event, data.loaded ? 'reload' : '');
-									data.loaded = true;
-									var args = {
-										videoId: options.id,
-										startSeconds: options.start,
-										endSeconds: options.end,
-									};
-									// if (options.pause) {
-									// player.cueVideoById(args);
-									// } else {
-									// }
-									player.loadVideoById(args);
+									if (data.player) {
+										data.loaded = true;
+										var args = {
+											videoId: data.options.id,
+											startSeconds: data.options.start,
+											endSeconds: data.options.end,
+										};
+										data.player.loadVideoById(args);
+									}
 								},
 								onStateChange: function(event) {
 									console.log('state change', event);
 									if (!data.duration && event.data === YT.PlayerState.PLAYING) {
-										data.duration = player.getDuration();
+										data.duration = data.player.getDuration();
 										$rootScope.safe_apply();
 									}
 								},
