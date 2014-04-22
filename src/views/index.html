@@ -110,13 +110,13 @@
 									</li>
 									<li ng-if="item.k=='t'" class="divider"></li>
 									<li ng-if="item.k=='y'">
-										<a ng-click="toggle_pause(item)">Turn auto play {{item.p && 'on' || 'off'}}</a>
-									</li>
-									<li ng-if="item.k=='y'">
 										<a ng-click="set_yt_start_time(item, ytdata)">Set start time as current player time</a>
 									</li>
 									<li ng-if="item.k=='y'">
 										<a ng-click="set_yt_end_time(item, ytdata)">Set end time as current player time</a>
+									</li>
+									<li ng-if="item.k=='y' && (item.s || item.e)">
+										<a ng-click="clear_yt_times(item, ytdata)">Clear start and end times ({{(item.s || 0) | format_time}} - {{(item.e || ytdata.duration) | format_time}})</a>
 									</li>
 									<li ng-if="item.k=='y'" class="divider"></li>
 									<li>
@@ -138,7 +138,7 @@
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
-							<div ng-switch-when="y" class="youtube-item" ng-youtube="{id: item.y, start: item.s, end: item.e, reload: !editing}" ng-youtube-data="ytdata"></div>
+							<div ng-switch-when="y" class="youtube-item" ng-youtube="{id: item.y, start: item.s, end: item.e, editing: editing}" ng-youtube-data="ytdata"></div>
 						</div>
 					</div>
 				</div>

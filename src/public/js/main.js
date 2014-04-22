@@ -388,10 +388,18 @@
 				return event_completed(event);
 			};
 			$scope.set_yt_start_time = function(item, ytdata) {
-				item.s = Math.floor(ytdata.player.getCurrentTime());
+				if (ytdata.player) {
+					item.s = Math.floor(ytdata.player.getCurrentTime());
+				}
 			};
 			$scope.set_yt_end_time = function(item, ytdata) {
-				item.e = Math.floor(ytdata.player.getCurrentTime());
+				if (ytdata.player) {
+					item.e = Math.floor(ytdata.player.getCurrentTime());
+				}
+			};
+			$scope.clear_yt_times = function(item, ytdata) {
+				delete item.s;
+				delete item.e;
 			};
 			$scope.send_to_front = function(item, index, event) {
 				$scope.page.i.splice(index, 1);
@@ -498,8 +506,11 @@
 					if (data.player) {
 						data.player.destroy();
 					}
-					data.loaded = false;
 					data.player = null;
+					if (!options.editing) {
+						play();
+						return;
+					}
 					var play_btn = $('<div class="table-layout text-center" ' +
 						'style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer">' +
 						'<div class="table-row expand-height"></div>' +
@@ -527,9 +538,8 @@
 							},
 							events: {
 								onReady: function(event) {
-									console.log('player_ready', event, data.loaded ? 'reload' : '');
+									console.log('player_ready', event);
 									if (data.player) {
-										data.loaded = true;
 										var args = {
 											videoId: data.options.id,
 											startSeconds: data.options.start,
