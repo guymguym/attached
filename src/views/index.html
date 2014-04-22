@@ -5,7 +5,7 @@
 	<?# def.include( 'common_head.html') ?>
 </head>
 
-<body ng-controller="MainCtrl" ng-cloak ng-style="{color: attached.fg, borderColor: attached.fg, backgroundColor: attached.bg}">
+<body ng-controller="MainCtrl" ng-cloak ng-style="{color: attached.fg, borderColor: attached.fg, backgroundColor: attached.bg}" class="{{editing && 'edit-mode' || 'view-mode'}}">
 
 	<div>
 		<?# def.include( 'common_body.html') ?>
@@ -22,43 +22,48 @@
 						~
 						<a href="http://attached.io" target="_blank">attached.io</a>
 						was designed by
-						<a href="https://www.noobaa.com" target="_blank">NooBaa</a>
+						<a href="https://www.noobaa.com" target="_blank">noobaa</a>
 						~
 					</i>
 				</div>
-				<button class="btn btn-link btn-sm" ng-click="editing=!editing">Edit</button>
+				<button class="btn btn-link btn-sm" ng-click="editing=!editing">
+					<span ng-show="editing">
+						<i class="fa fa-check"></i>
+						edit done
+					</span>
+					<span ng-show="!editing">
+						edit
+					</span>
+				</button>
 				<!-- <button class="btn btn-link" ng-click="">+ Item</button> -->
 				<!-- <button class="btn btn-link btn-sm" ng-click="share()">Share</button> -->
 				<!-- <a class="btn btn-link" href="/" target="_blank">New</a> -->
-				<div class="pad-1"></div>
 			</div>
-		</div>
-
-		<div class="table-row">
-			<div ng-show="editing">
-				<div class="container fadeIn">
+			<div class="show-on-edit-mode">
+				<div class="pad-1"></div>
+				<div class="container pullDown">
+					<div class="clearfix text-center">
+						<span>Colors</span>&nbsp;
+						<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
+						<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
+					</div>
 					<div class="clearfix text-center">
 						<button ng-click="" class="btn btn-default">+ Text</button>
 						<button ng-click="" class="btn btn-default">+ URL</button>
 						<button ng-click="" class="btn btn-default">+ File</button>
-						<span>Colors</span>&nbsp;
-						<div style="display: inline-block">
-						<div class="input-group">
-							<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
-							<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
-						</div>
-						</div>
 					</div>
 				</div>
+				<div class="pad-3"></div>
 			</div>
+			<div class="pad-1"></div>
 		</div>
 
 
 		<div class="table-row expand-height">
 			<div class="container expand-height">
-				<div id="story-container" class="expand-height" dropzone="link">
-					<div ng-repeat="item in page.i" class="story-item {{editing && 'edit-story-item'}}" ng-edit-layout="{l: item.l, mover: '.story-item-header', resizer: '.story-item-resizer'}" ng-init="ytdata={}">
-						<div class="story-item-header clearfix" ng-show="editing" ng-style="{backgroundColor: attached.bg}">
+				<div id="story-container" class="expand-height clearfix" dropzone="link">
+					<div ng-repeat="item in page.i" class="story-item" ng-edit-layout="{l: item.l, mover: '.story-item-header', resizer: '.story-item-resizer'}" ng-init="ytdata={}">
+						<div class="story-item-header show-on-edit-mode clearfix" ng-style="{backgroundColor: attached.bg}">
 							<span ng-if="item.k=='t'">
 								<button ng-click="edit_item_text(item)" class="btn btn-link" title="Edit text" ng-tip>
 									<i class="fa fa-pencil"></i>
@@ -77,9 +82,6 @@
 								-
 								<button ng-click="set_yt_end_time(item, ytdata)" class="btn btn-link" title="Set end time as current player time" ng-tip>
 									{{(item.e || ytdata.duration) | format_time}}]
-								</button>
-								<button ng-click="toggle_pause(item)" class="btn btn-link" title="Set auto pause/play on load" ng-tip>
-									<i class="fa fa-{{item.p && 'pause' || 'play'}}"></i>
 								</button>
 							</span>
 							<button ng-click="send_to_front(item, $index, $event)" class="btn btn-link" title="Send to Front" ng-tip>
@@ -134,7 +136,7 @@
 							 -->
 						</div>
 						<div class="story-item-content" ng-switch="item.k">
-							<div ng-if="editing" class="story-item-cover" ng-style="{backgroundColor: attached.bg}"></div>
+							<div class="story-item-cover show-on-edit-mode" ng-style="{backgroundColor: attached.bg}"></div>
 							<div ng-switch-when="t" class="text-item serif" ng-style="{fontSize: item.s}">{{item.t}}</div>
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>

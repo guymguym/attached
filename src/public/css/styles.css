@@ -37,9 +37,17 @@ body {
 .menubar:hover {
 	opacity: 1;
 }
+.view-mode .ui-resizable-handle, .view-mode .show-on-edit-mode {
+	display: none !important;
+}
+.view-mode #story-container {
+	border: none;
+}
 #story-container {
 	position: relative;
 	height: 100%;
+	border-style: dashed;
+	border-width: 2px;
 }
 .story-item {
 	position: absolute;
@@ -47,9 +55,6 @@ body {
 	min-width: 50px;
 	top: 0;
 	left: 0;
-}
-.story-item:not(.edit-story-item) .ui-resizable-handle {
-	display: none !important;
 }
 .story-item-header {
 	position: absolute;
@@ -84,6 +89,9 @@ body {
 	position: relative;
 	height: 100%;
 	width: 100%;
+}
+.youtube-item:hover .fa-youtube-play {
+	opacity: 0.6;
 }
 .text-item {
 	position: relative;

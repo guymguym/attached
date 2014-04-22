@@ -48,7 +48,6 @@
 						},
 						s: 12, // start seconds
 						e: 12, // end seconds
-						p: 1, // pause
 						*/
 					}]
 				}]
@@ -282,13 +281,6 @@
 				item.s = sz - 5;
 				return event_completed(event);
 			};
-			$scope.toggle_pause = function(item) {
-				if (item.p) {
-					delete item.p;
-				} else {
-					item.p = 1;
-				}
-			};
 			$scope.set_yt_start_time = function(item, ytdata) {
 				item.s = Math.floor(ytdata.player.getCurrentTime());
 			};
@@ -398,48 +390,62 @@
 					return;
 				}
 				console.log('ngYoutube');
-				youtube_api_load_promise.then(function() {
-					var player = data.player = new YT.Player(elem[0], {
-						height: '100%',
-						width: '100%',
-						playerVars: {
-							iv_load_policy: 3, // hide video annotations
-							rel: 0, // hide suggested related videos
-							showinfo: 0, // hide title and uploader info
-							theme: 'light',
-							// wmode: 'opaque', // doesnt do anything
-						},
-						events: {
-							onReady: function(event) {
-								console.log('player_ready', event, data.loaded ? 'reload' : '');
-								data.loaded = true;
-								var args = {
-									videoId: options.id,
-									startSeconds: options.start,
-									endSeconds: options.end,
-								};
-								if (options.pause) {
-									player.cueVideoById(args);
-								} else {
+				var play_btn = $('<div class="table-layout text-center" ' +
+					'style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer">' +
+					'<div class="table-row expand-height"></div>' +
+					'<div class="table-row"><i class="fa fa-youtube-play fa-4x"></i></div>' +
+					'<div class="table-row expand-height"></div></div>')
+					.on('click', load_player);
+				elem.empty().append($('<img>', {
+					src: 'https://img.youtube.com/vi/' + options.id + '/0.jpg',
+					width: '100%',
+					height: '100%'
+				})).append(play_btn);
+
+				function load_player() {
+					youtube_api_load_promise.then(function() {
+						var player = data.player = new YT.Player(elem[0], {
+							height: '100%',
+							width: '100%',
+							playerVars: {
+								iv_load_policy: 3, // hide video annotations
+								rel: 0, // hide suggested related videos
+								showinfo: 0, // hide title and uploader info
+								theme: 'light',
+								// wmode: 'opaque', // doesnt do anything
+							},
+							events: {
+								onReady: function(event) {
+									console.log('player_ready', event, data.loaded ? 'reload' : '');
+									data.loaded = true;
+									var args = {
+										videoId: options.id,
+										startSeconds: options.start,
+										endSeconds: options.end,
+									};
+									// if (options.pause) {
+									// player.cueVideoById(args);
+									// } else {
+									// }
 									player.loadVideoById(args);
+								},
+								onStateChange: function(event) {
+									console.log('state change', event);
+									if (!data.duration && event.data === YT.PlayerState.PLAYING) {
+										data.duration = player.getDuration();
+										$rootScope.safe_apply();
+									}
+								},
+								onPlaybackQualityChange: function(event) {
+									console.log('playback quality change', event);
+								},
+								onError: function(event) {
+									console.log('ERROR FROM YOUTUBE PLAYER', event);
 								}
-							},
-							onStateChange: function(event) {
-								console.log('state change', event);
-								if (!data.duration && event.data === YT.PlayerState.PLAYING) {
-									data.duration = player.getDuration();
-									$rootScope.safe_apply();
-								}
-							},
-							onPlaybackQualityChange: function(event) {
-								console.log('playback quality change', event);
-							},
-							onError: function(event) {
-								console.log('ERROR FROM YOUTUBE PLAYER', event);
 							}
-						}
+						});
 					});
-				});
+				}
 			};
 		}
 	]);
