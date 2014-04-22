@@ -18,24 +18,48 @@
 
 			$scope.attached = {
 				bg: '#282828',
-				fg: '#ffff00',
+				fg: '#009194',
 				p: [{ // pages
 					i: [{ // items
 						k: 't', // kind
-						t: 'Tell your story...', // text
+						t: 'Welcome to attach.io', // text
 						l: { // layout
-							l: 300, // left
+							l: 20, // left
 							t: 50, // top
 						},
 						s: 50 // font size
 					}, {
+						k: 't',
+						t: 'Drag & Drop youtube videos or web images into this window, or use the buttons on top.',
+						l: {
+							l: 20,
+							t: 200,
+						},
+						s: 18
+					}, {
+						k: 't',
+						t: 'Move and resize the items, change colors, undo/redo using the browser back/forward actions',
+						l: {
+							l: 20,
+							t: 320,
+						},
+						s: 18
+					}, {
+						k: 't',
+						t: 'When you\'re done editing, simply select the long browser address, and share it in your favorite way (email/socialnets/etc) and whoever will follow the link will see the same page you designed.',
+						l: {
+							l: 20,
+							t: 440,
+						},
+						s: 18
+					}, {
 						k: 'i',
 						u: '/public/images/giraffe.gif', // url
 						l: {
-							l: 300,
-							t: 200,
-							w: 400,
-							h: 200,
+							l: 710,
+							t: 50,
+							w: 250,
+							h: 150,
 						}
 						/*}, {
 						k: 'y',
