@@ -333,10 +333,13 @@
 			zeroclip.on('load', function() {
 				zeroclip.on('dataRequested', function(client, args) {
 					console.log('ZEROCLIP dataRequested');
+					$scope.editing = false;
+					$scope.safe_apply();
 					client.setText($location.absUrl());
 				});
 				zeroclip.on('complete', function(client, args) {
-					console.log('ZEROCLIP complete');
+					$scope.editing = false;
+					$scope.safe_apply();
 					alertify.log('Copied URL to clipbaord');
 				});
 			});
