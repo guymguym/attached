@@ -103,6 +103,9 @@ body {
 /**/
 
 /**/
+.inblock {
+	display: inline-block;
+}
  .pad-1 {
 	padding-top: 10px;
 }

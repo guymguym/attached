@@ -26,31 +26,29 @@
 						~
 					</i>
 				</div>
-				<button class="btn btn-link btn-sm" ng-click="editing=!editing">
+				<button class="btn btn-link" ng-click="editing=!editing">
 					<span ng-show="editing">
 						<i class="fa fa-check"></i>
-						edit done
+						finish edit
 					</span>
 					<span ng-show="!editing">
-						edit
+						start edit
 					</span>
 				</button>
-				<!-- <button class="btn btn-link" ng-click="">+ Item</button> -->
 				<!-- <button class="btn btn-link btn-sm" ng-click="share()">Share</button> -->
 				<!-- <a class="btn btn-link" href="/" target="_blank">New</a> -->
 			</div>
 			<div class="show-on-edit-mode">
 				<div class="pad-1"></div>
-				<div class="container pullDown">
-					<div class="clearfix text-center">
-						<span>Colors</span>&nbsp;
+				<div class="container pullDown text-center">
+					<button ng-click="create_item_text()" class="btn btn-default btn-oversized inblock">+ Text</button>
+					<button ng-click="create_item_url()" class="btn btn-default btn-oversized inblock">+ URL</button>
+					<div class="pull-right">
+						<div>
+							<label><u>Colors</u>:</label>
+						</div>
 						<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
 						<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
-					</div>
-					<div class="clearfix text-center">
-						<button ng-click="" class="btn btn-default">+ Text</button>
-						<button ng-click="" class="btn btn-default">+ URL</button>
-						<button ng-click="" class="btn btn-default">+ File</button>
 					</div>
 				</div>
 				<div class="pad-3"></div>

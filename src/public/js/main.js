@@ -17,8 +17,8 @@
 		function($scope, $http, $window, $location, $q, $timeout, $interval, $sce) {
 
 			$scope.attached = {
-				bg: '#282828',
-				fg: '#009194',
+				bg: '#282828', // dark grey
+				fg: '#009194', // teal
 				p: [{ // pages
 					i: [{ // items
 						k: 't', // kind
@@ -54,11 +54,20 @@
 						s: 18
 					}, {
 						k: 'i',
-						u: '/public/images/giraffe.gif', // url
+						u: '/public/images/joevscat.gif', // url
 						l: {
 							l: 710,
 							t: 50,
 							w: 250,
+							h: 150,
+						}
+					}, {
+						k: 'i',
+						u: '/public/images/giraffe.gif',
+						l: {
+							l: 750,
+							t: 250,
+							w: 200,
 							h: 150,
 						}
 						/*}, {
@@ -95,9 +104,12 @@
 					return;
 				}
 				$scope.ignore_attached_update = true;
-				$scope.attached = decode_hash(hash_value);
-				$scope.page = $scope.attached.p[$scope.page_index];
-				console.log('hash data', $scope.attached);
+				var attached = decode_hash(hash_value);
+				if (attached) {
+					$scope.attached = attached;
+					$scope.page = $scope.attached.p[$scope.page_index];
+					console.log('hash data', $scope.attached);
+				}
 			});
 			$scope.$watch('page_index', function() {
 				console.log('page', $scope.page_index);
@@ -130,10 +142,18 @@
 			}
 
 			function decode_hash(hash) {
-				var json = LZString.decompressFromBase64(hash);
-				var obj = angular.fromJson(json);
-				console.log('DECODE HASH', hash.length, '->', json.length);
-				return obj;
+				if (!hash) {
+					return;
+				}
+				try {
+					var json = LZString.decompressFromBase64(hash);
+					var obj = angular.fromJson(json);
+					console.log('DECODE HASH', hash.length, '->', json.length);
+					return obj;
+				} catch (err) {
+					console.log('FAILED DECODE HASH', err);
+					return;
+				}
 			}
 
 
@@ -150,93 +170,21 @@
 			story_container.addEventListener('dragleave', event_completed);
 			story_container.addEventListener('drop', function(event) {
 				console.log('DROP', event);
+				var pos = {
+					left: event.offsetX,
+					top: event.offsetY,
+				};
 				_.each(event.dataTransfer.items, function(drop_item) {
 					// copy the info to our closure because the drop_item object 
 					// gets cleared once we complete the event
 					var kind = drop_item.kind;
 					var type = drop_item.type;
-					var count = 0;
 					if (kind === 'string') {
 						drop_item.getAsString(function(str) {
 							console.log('DROP', kind, type, str);
-							if (type !== 'text/uri-list') {
-								return;
+							if (type === 'text/uri-list') {
+								create_item_from_url(str, pos);
 							}
-							var left = event.offsetX + (count * 20);
-							var top = event.offsetY + (count * 20);
-							var yt = parse_youtube_url(str);
-							if (yt) {
-								var item = {
-									k: 'y',
-									y: yt.videoId,
-									l: {
-										l: left,
-										t: top,
-										w: 400,
-										h: 300,
-									}
-								};
-								count++;
-								$scope.page.i.push(item);
-								$scope.safe_apply();
-								return;
-							}
-							// check if url is image
-							$('<img>', {
-								src: str,
-								width: 1,
-								height: 1,
-								load: function() {
-									var item = {
-										k: 'i',
-										u: str,
-										l: {
-											l: left,
-											t: top,
-											w: 200,
-										}
-									};
-									count++;
-									$scope.page.i.push(item);
-									$scope.safe_apply();
-								},
-								error: function() {
-									alertify.log('Unable to create item from URL. Try with image or youtube.');
-								},
-							});
-							/*
-							$http({
-								method: 'HEAD',
-								url: str,
-								withCredentials: true,
-								headers: {
-									'Access-Control-Allow-Origin': '*',
-									'Access-Control-Allow-Methods': 'HEAD',
-									'Access-Control-Allow-Headers': 'Content-Type, X-Requested-With',
-									'X-Random-Shit': '123123123'
-								}
-							}).then(function(res) {
-								var content_type = res.headers('content-type');
-								console.log('HEAD', content_type);
-								var kind = content_type.split('/')[0];
-								if (kind === 'image') {
-									var item = {
-										k: 'i',
-										u: str,
-										l: {
-											l: left,
-											t: top,
-										}
-									};
-									count++;
-									$scope.page.i.push(item);
-									$scope.safe_apply();
-									return;
-								} else {
-									// TODO handle video/audio
-								}
-							});
-							*/
 						});
 					} else {
 						// kind === 'file'
@@ -280,12 +228,106 @@
 				}
 			}
 
+			function create_item_from_url(url, pos) {
+				var yt = parse_youtube_url(url);
+				if (yt) {
+					add_item({
+						k: 'y',
+						y: yt.videoId,
+						l: {
+							w: 400,
+							h: 300,
+						}
+					}, pos);
+					return;
+				}
+				// check if url is image
+				$('<img>', {
+					src: url,
+					width: 1,
+					height: 1,
+					load: function() {
+						add_item({
+							k: 'i',
+							u: url,
+							l: {
+								w: 200,
+							}
+						}, pos);
+					},
+					error: function() {
+						alertify.log('Unable to create item from URL. Try with image or youtube.');
+					},
+				});
+				/*
+				$http({
+					method: 'HEAD',
+					url: url,
+					withCredentials: true,
+					headers: {
+						'Access-Control-Allow-Origin': '*',
+						'Access-Control-Allow-Methods': 'HEAD',
+						'Access-Control-Allow-Headers': 'Content-Type, X-Requested-With',
+						'X-Random-Shit': '123123123'
+					}
+				}).then(function(res) {
+					var content_type = res.headers('content-type');
+					console.log('HEAD', content_type);
+					var kind = content_type.split('/')[0];
+					if (kind === 'image') {
+						add_item({
+							k: 'i',
+							u: url,
+							l: {}
+						}, pos);
+						return;
+					} else {
+						// TODO handle video/audio
+					}
+				});
+				*/
+			}
+
+			function add_item(item, pos) {
+				if (pos) {
+					item.l.left = pos.left;
+					item.l.top = pos.top;
+					pos.left += 20;
+					pos.top += 20;
+				}
+				$scope.page.i.push(item);
+				$scope.safe_apply();
+			}
 
 			////////////////////////////
 			// ITEM EDITING FUNCTIONS //
 			////////////////////////////
 
 
+			$scope.create_item_text = function() {
+				alertify.prompt('Enter text:', function(e, text) {
+					if (e) {
+						add_item({
+							k: 't',
+							t: text,
+							l: {
+								l: 0,
+								t: 0,
+							}
+						});
+					}
+				});
+			};
+			$scope.create_item_url = function() {
+				alertify.prompt('Paste URL:', function(e, url) {
+					if (e) {
+						create_item_from_url(url, {
+							left: 0,
+							top: 0,
+						});
+					}
+				});
+			};
 			$scope.edit_item_text = function(item) {
 				alertify.prompt('Write something inspiring:', function(e, str) {
 					if (e) {
