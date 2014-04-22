@@ -226,7 +226,9 @@ app.get('/logout', function(req, res) {
 */
 
 app.get('/', function(req, res) {
-	return res.render('index.html');
+	return res.render('index.html', {
+		title: req.query.t
+	});
 });
 
 

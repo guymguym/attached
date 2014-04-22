@@ -18,7 +18,7 @@
 			<div class="menubar container clearfix fadeIn">
 				<div style="padding: 5px 0" class="pull-right">
 					<i class="serif">
-						<!-- <img src="/public/images/ampbw.png" width="15" height="15" style="vertical-align: middle"></img> -->
+						<img src="/public/images/ampbw.png" class="hidden" style="vertical-align: middle"></img>
 						~
 						<a href="http://attached.io" target="_blank">attached.io</a>
 						was designed by
@@ -26,14 +26,12 @@
 						~
 					</i>
 				</div>
-				<button class="btn btn-link" ng-click="editing=!editing">
-					<span ng-show="editing">
-						<i class="fa fa-check"></i>
-						finish edit
-					</span>
-					<span ng-show="!editing">
-						start edit
-					</span>
+				<button class="btn btn-link" ng-show="!editing" ng-click="editing=true">
+					start edit
+				</button>
+				<button class="btn btn-link" ng-show="editing" id="finish_edit_btn" ng-click="editing=false">
+					<i class="fa fa-check"></i>
+					finish edit
 				</button>
 				<!-- <button class="btn btn-link btn-sm" ng-click="share()">Share</button> -->
 				<!-- <a class="btn btn-link" href="/" target="_blank">New</a> -->

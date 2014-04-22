@@ -115,16 +115,16 @@
 				console.log('page', $scope.page_index);
 				$scope.page = $scope.attached.p[$scope.page_index];
 			});
-			$scope.$watch('attached', update_url_hash, true /*deep equality check*/ );
+			$scope.$watch('attached', update_url_data, true /*deep equality check*/ );
 			$scope.page_index = 0; // triggers page watch too
 
-			function update_url_hash() {
+			function update_url_data() {
 				// throttle down
-				$timeout.cancel($scope.update_url_hash_timeout);
-				$timeout(_update_url_hash, 250);
+				$timeout.cancel($scope.update_url_data_timeout);
+				$timeout(_update_url_data, 250);
 			}
 
-			function _update_url_hash() {
+			function _update_url_data() {
 				// ignore watches when we just modified the attached data
 				if ($scope.ignore_attached_update) {
 					$scope.ignore_attached_update = false;
@@ -132,6 +132,27 @@
 				}
 				$scope.ignore_hash_update = true;
 				$location.hash(encode_hash($scope.attached));
+				// auto detect page title
+				var top_title;
+				var topest = -1;
+				var big_title;
+				var bigest = -1;
+				_.each($scope.page.i, function(item) {
+					if (item.k !== 't') {
+						return;
+					}
+					if (topest < 0 || item.l.t < topest) {
+						topest = item.l.t;
+						top_title = item.t;
+					}
+					if (bigest < 0 || item.s > bigest) {
+						bigest = item.l.t;
+						big_title = item.t;
+					}
+				});
+				var title = top_title || big_title || 'attached.io - amplify your message';
+				console.log('TITLE', title);
+				$location.search('t', title);
 			}
 
 			function encode_hash(obj) {
@@ -305,6 +326,20 @@
 			// ITEM EDITING FUNCTIONS //
 			////////////////////////////
 
+			var zeroclip = new ZeroClipboard($('#finish_edit_btn'), {
+				swfPath: '/vendor-n/zeroclipboard/ZeroClipboard.swf',
+				moviePath: '/vendor-n/zeroclipboard/ZeroClipboard.swf'
+			});
+			zeroclip.on('load', function() {
+				zeroclip.on('dataRequested', function(client, args) {
+					console.log('ZEROCLIP dataRequested');
+					client.setText($location.absUrl());
+				});
+				zeroclip.on('complete', function(client, args) {
+					console.log('ZEROCLIP complete');
+					alertify.log('Copied URL to clipbaord');
+				});
+			});
 
 			$scope.create_item_text = function() {
 				alertify.prompt('Enter text:', function(e, text) {
