@@ -1,6 +1,6 @@
 {
 	"name": "attached.io",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"dependencies": {
 		"alertify.js": "0.3.x"
 	},
