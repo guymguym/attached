@@ -7,7 +7,7 @@
 
 	// create our module
 	var app = angular.module('attached_app', [
-		'ngRoute',
+		// 'ngRoute',
 		// 'ngTouch',
 		// 'ngSanitize',
 		// 'ngAnimate',
@@ -136,8 +136,9 @@
 
 			function encode_hash(obj) {
 				var json = angular.toJson(obj);
-				var hash = LZString.compressToBase64(json);
-				console.log('ENCODE HASH', json.length, '->', hash.length);
+				var coded = LZString.compressToBase64(json);
+				var hash = encodeURIComponent(coded);
+				console.log('ENCODE HASH', json.length, '->', coded.length, '->', hash.length);
 				return hash;
 			}
 
@@ -146,9 +147,10 @@
 					return;
 				}
 				try {
-					var json = LZString.decompressFromBase64(hash);
+					var coded = decodeURIComponent(hash);
+					var json = LZString.decompressFromBase64(coded);
 					var obj = angular.fromJson(json);
-					console.log('DECODE HASH', hash.length, '->', json.length);
+					console.log('DECODE HASH', hash.length, '->', coded.length, '->', json.length);
 					return obj;
 				} catch (err) {
 					console.log('FAILED DECODE HASH', err);
@@ -568,9 +570,13 @@
 		}
 	]);
 
-	app.config(['$routeProvider', '$locationProvider', '$httpProvider',
-		function($routeProvider, $locationProvider, $httpProvider) {
-			// $locationProvider.html5Mode(true);
+	app.config([
+		'$locationProvider',
+		// '$routeProvider',
+		// '$httpProvider',
+		function($locationProvider) {
+			$locationProvider.html5Mode(true);
+			// $locationProvider.hashPrefix('!');
 		}
 	]);
 
