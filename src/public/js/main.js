@@ -99,7 +99,6 @@
 			$scope.$watch('$location.hash()', function(hash_value) {
 				// ignore watches when we just modified the hash
 				if ($scope.ignore_hash_update) {
-					console.log('hash change ignored');
 					$scope.ignore_hash_update = false;
 					return;
 				}
@@ -153,6 +152,7 @@
 				var title = top_title || big_title || 'attached.io - amplify your message';
 				console.log('TITLE', title);
 				$location.search('t', title);
+				console.log('URL length', $location.absUrl().length);
 			}
 
 			function encode_hash(obj) {
@@ -326,13 +326,14 @@
 			// ITEM EDITING FUNCTIONS //
 			////////////////////////////
 
-			var zeroclip = new ZeroClipboard($('#finish_edit_btn'), {
+			ZeroClipboard.config({
 				swfPath: '/vendor-n/zeroclipboard/ZeroClipboard.swf',
 				moviePath: '/vendor-n/zeroclipboard/ZeroClipboard.swf'
 			});
+			var zeroclip = new ZeroClipboard($('#finish_edit_btn'));
 			zeroclip.on('load', function() {
 				zeroclip.on('dataRequested', function(client, args) {
-					console.log('ZEROCLIP dataRequested');
+					console.log('ZEROCLIP copy');
 					$scope.editing = false;
 					$scope.safe_apply();
 					client.setText($location.absUrl());
