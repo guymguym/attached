@@ -410,13 +410,8 @@
 				$scope.page.i.unshift(item);
 			};
 			$scope.delete_item = function(item, index, event) {
-				alertify.confirm('Are you sure you want to delete?', function(e) {
-					if (e) {
-						$scope.safe_apply(function() {
-							$scope.page.i.splice(index, 1);
-						});
-					}
-				});
+				$scope.page.i.splice(index, 1);
+				alertify.log('Deleted (to undo use browser back)');
 				return event_completed(event);
 			};
 
