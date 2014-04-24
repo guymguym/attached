@@ -37,7 +37,7 @@ gulp.task('jshint', function() {
 		.pipe(jshint.reporter('fail'));
 });
 
-gulp.task('js', function() {
+gulp.task('js', ['bower', 'jshint'], function() {
 	// single entry point to browserify
 	gulp.src(paths.client_main)
 		.pipe(browserify({
