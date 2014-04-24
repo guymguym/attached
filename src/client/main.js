@@ -17,7 +17,7 @@
 	var _ = require('underscore');
 	var LZString = require('lz-string');
 	var __select2 = require('select2-browserify');
-	var __ZeroClipboard = require('ZeroClipboard');
+	var __zeroclipboard = require('zeroclipboard');
 	// TODO alertify lib is not written well for browserify
 	// var alertify = require('alertify.js').alertify; 
 
