@@ -11,6 +11,7 @@
 		<?# def.include( 'common_body.html') ?>
 	</div>
 
+	<div class="back-image" ng-style="{backgroundImage: 'url(/public/images/patterns/'+attached.bi+')'}"></div>
 
 	<div class="table-layout">
 
@@ -42,11 +43,23 @@
 					<button ng-click="create_item_text()" class="btn btn-default btn-oversized inblock">Add Text</button>
 					<button ng-click="create_item_url()" class="btn btn-default btn-oversized inblock">Add URL</button>
 					<div class="pull-right">
-						<div>
-							<label><u>Colors</u>:</label>
+						<div class="clearfix">
+							<div>
+								<label><u>Colors</u>:</label>
+							</div>
+							<div style="padding-left: 50px">
+								<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control pull-left" style="width: 50px; padding: 6px">
+								<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control pull-left" style="width: 50px; padding: 6px">
+							</div>
 						</div>
-						<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
-						<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control Xinput-sm" style="width: 40px; padding: 6px">
+						<div class="clearfix">
+							<div>
+								<label><u>Wallpaper</u>:</label>
+							</div>
+							<select id="backimage_select" ng-model="attached.bi" ng-options="o for o in backimage_options" style="width: 200px">
+								<option value="">- None -</option>
+							</select>
+						</div>
 					</div>
 				</div>
 				<div class="pad-3"></div>
@@ -144,7 +157,6 @@
 				</div>
 			</div>
 		</div>
-
 
 
 	</div>
