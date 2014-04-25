@@ -38,75 +38,113 @@
 	app.controller('MainCtrl', ['$scope', '$http', '$window', '$location', '$q', '$timeout', '$interval', '$sce',
 		function($scope, $http, $window, $location, $q, $timeout, $interval, $sce) {
 
+
 			$scope.attached = {
-				bg: '#282828', // dark grey
-				fg: '#009194', // teal
-				p: [{ // pages
-					i: [{ // items
-						k: 't', // kind
-						t: 'Welcome to attach.io', // text
-						l: { // layout
-							l: 20, // left
-							t: 50, // top
+				"bg": "#424242",
+				"fg": "#d4fb41",
+				"bi": "shattered-island.gif",
+				"bo": "1",
+				"p": [{
+					"i": [{
+						"k": "t",
+						"t": "Share beautiful attachments",
+						"l": {
+							"l": 60,
+							"t": 30,
+							"w": 855,
+							"h": 120
 						},
-						s: 50 // font size
+						"s": 74
 					}, {
-						k: 't',
-						t: 'Drag & Drop youtube videos or web images into this window, or use the buttons on top.',
-						l: {
-							l: 20,
-							t: 200,
+						"k": "t",
+						"t": "Mix a page with youtube videos, images, animated gifs, and glue it together with your words.",
+						"l": {
+							"l": 60,
+							"t": 210,
+							"w": 255,
+							"h": 135
 						},
-						s: 18
+						"s": 22
 					}, {
-						k: 't',
-						t: 'Move and resize the items, change colors, undo/redo using the browser back/forward actions',
-						l: {
-							l: 20,
-							t: 320,
+						"k": "t",
+						"t": "Move, resize, change colors, and choose wallpapers to make it beautiful (undo/redo using back/forward of browser).",
+						"l": {
+							"l": 390,
+							"t": 810,
+							"w": 225,
+							"h": 180
 						},
-						s: 18
+						"s": 22
 					}, {
-						k: 't',
-						t: 'When you\'re done editing, simply select the long browser address, and share it in your favorite way (email/socialnets/etc) and whoever will follow the link will see the same page you designed.',
-						l: {
-							l: 20,
-							t: 440,
+						"k": "t",
+						"t": "To share click on the \"finish edit\" button on top-left corner, which will copy the link (long one) to your clipboard.",
+						"l": {
+							"l": 435,
+							"t": 555,
+							"w": 240,
+							"h": 150
 						},
-						s: 18
+						"s": 22
 					}, {
-						k: 'i',
-						u: '/public/images/joevscat.gif', // url
-						l: {
-							l: 710,
-							t: 50,
-							w: 250,
-							h: 150,
+						"k": "y",
+						"y": "1VQ_3sBZEm0",
+						"l": {
+							"w": 270,
+							"h": 195,
+							"left": 0,
+							"top": 0,
+							"l": 690,
+							"t": 510
+						},
+						"p": 1
+					}, {
+						"k": "y",
+						"y": "hvvjiE4AdUI",
+						"l": {
+							"w": 330,
+							"h": 255,
+							"left": 0,
+							"top": 0,
+							"l": 45,
+							"t": 735
+						},
+						"p": 1
+					}, {
+						"k": "y",
+						"y": "GI6CfKcMhjY",
+						"l": {
+							"w": 345,
+							"h": 240,
+							"left": 0,
+							"top": 0,
+							"l": 330,
+							"t": 210
+						},
+						"p": 1
+/*					}, {
+						"k": "i",
+						"u": "/public/images/joevscat.gif",
+						"l": {
+							"l": 75,
+							"t": 435,
+							"w": 225,
+							"h": 150
 						}
 					}, {
-						k: 'i',
-						u: '/public/images/giraffe.gif',
-						l: {
-							l: 750,
-							t: 250,
-							w: 200,
-							h: 150,
+						"k": "i",
+						"u": "/public/images/giraffe.gif",
+						"l": {
+							"l": 375,
+							"t": 240,
+							"w": 240,
+							"h": 195
 						}
-						/*}, {
-						k: 'y',
-						y: 'OprCOLuUPzY',
-						l: {
-							l: 0,
-							t: 500,
-							w: 400,
-							h: 300,
-						},
-						s: 12, // start seconds
-						e: 12, // end seconds
-						*/
+*/
 					}]
 				}]
 			};
+
+
 
 			function format_backimage(state) {
 				if (!state.id) {
@@ -437,12 +475,12 @@
 			$scope.increase_font_size = function(item, event) {
 				event.stopPropagation();
 				var sz = item.s || 40;
-				item.s = sz + 5;
+				item.s = sz + 2;
 				return event_completed(event);
 			};
 			$scope.decrease_font_size = function(item, event) {
 				var sz = item.s || 40;
-				item.s = sz - 5;
+				item.s = sz - 2;
 				return event_completed(event);
 			};
 			$scope.set_yt_start_time = function(item, ytdata) {
@@ -458,6 +496,13 @@
 			$scope.clear_yt_times = function(item, ytdata) {
 				delete item.s;
 				delete item.e;
+			};
+			$scope.set_yt_pause = function(item, value) {
+				if (value) {
+					item.p = 1;
+				} else {
+					delete item.p;
+				}
 			};
 			$scope.send_to_front = function(item, index, event) {
 				$scope.page.i.splice(index, 1);
@@ -560,7 +605,7 @@
 						data.player.destroy();
 					}
 					data.player = null;
-					if (!options.editing) {
+					if (!options.editing && !options.pause) {
 						play();
 						return;
 					}

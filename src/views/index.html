@@ -11,7 +11,7 @@
 		<?# def.include( 'common_body.html') ?>
 	</div>
 
-	<div class="back-image" ng-style="{backgroundImage: 'url(/public/images/patterns/'+attached.bi+')'}"></div>
+	<div class="back-image" ng-style="{backgroundImage: 'url(/public/images/patterns/'+attached.bi+')', opacity: attached.bo}"></div>
 
 	<div class="table-layout">
 
@@ -39,26 +39,25 @@
 			</div>
 			<div class="show-on-edit-mode">
 				<div class="pad-1"></div>
-				<div class="container pullDown text-center">
+				<div class="container pullDown">
 					<button ng-click="create_item_text()" class="btn btn-default btn-oversized inblock">Add Text</button>
 					<button ng-click="create_item_url()" class="btn btn-default btn-oversized inblock">Add URL</button>
-					<div class="pull-right">
-						<div class="clearfix">
-							<div>
-								<label><u>Colors</u>:</label>
-							</div>
-							<div style="padding-left: 50px">
-								<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control pull-left" style="width: 50px; padding: 6px">
-								<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control pull-left" style="width: 50px; padding: 6px">
-							</div>
+					<div class="pull-right clearfix" style="padding: 20px">
+						<div>
+							<label><u>Wallpaper</u>:</label>
 						</div>
-						<div class="clearfix">
-							<div>
-								<label><u>Wallpaper</u>:</label>
-							</div>
-							<select id="backimage_select" ng-model="attached.bi" ng-options="o for o in backimage_options" style="width: 200px">
-								<option value="">- None -</option>
-							</select>
+						<select id="backimage_select" ng-model="attached.bi" ng-options="o for o in backimage_options" style="width: 250px">
+							<option value="">- None -</option>
+						</select>
+						<input ng-model="attached.bo" type="range" min="0" max="1" value="0.3" step="0.05" class="Xform-control" />
+					</div>
+					<div class="pull-right clearfix" style="padding: 20px">
+						<div>
+							<label><u>Colors</u>:</label>
+						</div>
+						<div>
+							<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control pull-left" style="width: 50px; padding: 6px">
+							<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control pull-left" style="width: 50px; padding: 6px">
 						</div>
 					</div>
 				</div>
@@ -123,6 +122,19 @@
 									</li>
 									<li ng-if="item.k=='t'" class="divider"></li>
 									<li ng-if="item.k=='y'">
+										<a ng-click="set_yt_pause(item, false)">
+											<i class="fa fa-check" ng-hide="item.p"></i>
+											Play immediately
+										</a>
+									</li>
+									<li ng-if="item.k=='y'">
+										<a ng-click="set_yt_pause(item, true)">
+											<i class="fa fa-check" ng-show="item.p"></i>
+											Start paused
+										</a>
+									</li>
+									<li ng-if="item.k=='y'" class="divider"></li>
+									<li ng-if="item.k=='y'">
 										<a ng-click="set_yt_start_time(item, ytdata)">Set start time as current player time</a>
 									</li>
 									<li ng-if="item.k=='y'">
@@ -151,7 +163,7 @@
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
-							<div ng-switch-when="y" class="youtube-item" ng-youtube="{id: item.y, start: item.s, end: item.e, editing: editing}" ng-youtube-data="ytdata"></div>
+							<div ng-switch-when="y" class="youtube-item" ng-youtube="{id: item.y, start: item.s, end: item.e, editing: editing, pause: item.p}" ng-youtube-data="ytdata"></div>
 						</div>
 					</div>
 				</div>
