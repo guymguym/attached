@@ -56,8 +56,12 @@
 							<label><u>Colors</u>:</label>
 						</div>
 						<div>
-							<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control pull-left" style="width: 50px; padding: 6px">
-							<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control pull-left" style="width: 50px; padding: 6px">
+							<input ng-model="attached.fg" name="fgcolor" type="color" class="form-control input-sm pull-left" style="width: 50px; padding: 6px">
+							<input ng-model="attached.bg" name="bgcolor" type="color" class="form-control input-sm pull-left" style="width: 50px; padding: 6px">
+							<select ng-model="attached.td" class="form-control input-sm" style="width: 100px">
+								<option value="">Align Left</option>
+								<option value="rtl">Align Right</option>
+							</select>
 						</div>
 					</div>
 				</div>
@@ -159,7 +163,7 @@
 						</div>
 						<div class="story-item-content" ng-switch="item.k">
 							<div class="story-item-cover show-on-edit-mode" ng-style="{backgroundColor: attached.bg}"></div>
-							<div ng-switch-when="t" class="text-item serif" ng-style="{fontSize: item.s}">{{item.t}}</div>
+							<div ng-switch-when="t" class="text-item serif" ng-style="{fontSize: item.s, direction: attached.td}">{{item.t}}</div>
 							<img ng-switch-when="i" ng-src="{{item.u}}" />
 							<video ng-switch-when="v" ng-src="{{item.u}}"></video>
 							<audio ng-switch-when="a" ng-src="{{item.u}}"></audio>
