@@ -38,6 +38,13 @@ var URL = require('url');
 var http = require('http');
 var dot_emc = require('dot-emc');
 var express = require('express');
+var favicon = require('static-favicon');
+var morgan_logger = require('morgan');
+var body_parser = require('body-parser');
+var cookie_parser = require('cookie-parser');
+var cookie_session = require('cookie-session');
+var method_override = require('method-override');
+var compression = require('compression');
 var fs = require('fs');
 // var mongoose = require('mongoose');
 // var passport = require('passport');
@@ -90,8 +97,8 @@ passport.deserializeUser(function(user_data, done) {
 
 // configure app middleware handlers in the order to use them
 
-app.use(express.favicon('/public/images/ampbw.png'));
-app.use(express.logger());
+app.use(favicon(path.join(__dirname, '..', '..', 'images', 'ampbw.png')));
+app.use(morgan_logger());
 app.use(function(req, res, next) {
 	// HTTPS redirect:
 	var fwd_proto = req.get('X-Forwarded-Proto');
@@ -104,12 +111,13 @@ app.use(function(req, res, next) {
 	}
 	return next();
 });
-app.use(express.cookieParser(process.env.COOKIE_SECRET));
-app.use(express.bodyParser());
-app.use(express.methodOverride());
-app.use(express.cookieSession({
+app.use(cookie_parser(process.env.COOKIE_SECRET));
+app.use(body_parser());
+app.use(method_override());
+app.use(cookie_session({
 	// no need for secret since its signed by cookieParser
 	key: 'attached_session',
+	signed: false, // already signed by cookie_parser
 	cookie: {
 		// TODO: setting max-age for all sessions although we prefer only for /auth.html
 		// but express/connect seems broken to accept individual session maxAge,
@@ -119,11 +127,36 @@ app.use(express.cookieSession({
 }));
 // app.use(passport.initialize());
 // app.use(passport.session());
-app.use(express.compress());
+app.use(compression());
 
-// using router before static files is optimized
+
+////////////
+// ROUTES //
+////////////
+// using routes before static files is optimized
 // since we have less routes then files, and the routes are in memory.
-app.use(app.router);
+
+/*
+app.get('/login', passport.authenticate('basic'), function(req, res) {
+	return res.redirect('/');
+});
+
+app.get('/logout', function(req, res) {
+	req.logout();
+	return res.redirect('/');
+});
+*/
+
+app.get('/', function(req, res) {
+	return res.render('index.html', {
+		title: req.query.t
+	});
+});
+
+
+////////////
+// STATIC //
+////////////
 
 function cache_control(seconds) {
 	var millis = 1000 * seconds;
@@ -134,7 +167,6 @@ function cache_control(seconds) {
 	};
 }
 
-// setup static files
 if (false && !debug_mode) {
 	// setup caching
 	app.use(cache_control(10 * 60)); // 10 minutes
@@ -211,27 +243,6 @@ function error_501(req, res, next) {
 }
 
 
-
-////////////
-// ROUTES //
-////////////
-
-/*
-app.get('/login', passport.authenticate('basic'), function(req, res) {
-	return res.redirect('/');
-});
-
-app.get('/logout', function(req, res) {
-	req.logout();
-	return res.redirect('/');
-});
-*/
-
-app.get('/', function(req, res) {
-	return res.render('index.html', {
-		title: req.query.t
-	});
-});
 
 
 
