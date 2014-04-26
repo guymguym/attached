@@ -1,4 +1,6 @@
-# attached.io - Share beautiful attachments
+# attached.io
+
+## Share beautiful attachments
 
 Mix a page with youtube videos, images, animated gifs, and glue it together with your words.
 To share click on the "finish edit" button on top-left corner, which will copy the link (long one) to your clipboard.
