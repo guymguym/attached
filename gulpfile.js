@@ -16,7 +16,7 @@ var gconcat = require('gulp-concat');
 var paths = {
 	css: './src/css/**/*',
 	views_ng: './src/views_ng/**/*',
-	scripts: ['./src/server/**/*', './src/client/**/*'],
+	scripts: ['./src/server/**/*', './src/client/**/*', './gulpfile.js'],
 	server_main: './src/server/server.js',
 	client_main: './src/client/main.js',
 	client_externals: [
