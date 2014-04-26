@@ -374,7 +374,7 @@
 						}, pos);
 					},
 					error: function() {
-						alertify.log('Unable to create item from URL. Try with image or youtube.');
+						alertify.error('Unable to create item from URL. Try with image or youtube.');
 					},
 				});
 				/*
@@ -436,7 +436,7 @@
 				zeroclip.on('complete', function(client, args) {
 					$scope.editing = false;
 					$scope.safe_apply();
-					alertify.log('Copied URL to clipbaord');
+					alertify.success('Copied URL to clipbaord');
 				});
 			});
 
@@ -514,7 +514,7 @@
 			};
 			$scope.delete_item = function(item, index, event) {
 				$scope.page.i.splice(index, 1);
-				alertify.log('Deleted (to undo use browser back)');
+				alertify.success('Deleted (to undo use browser back)');
 				return event_completed(event);
 			};
 

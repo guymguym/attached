@@ -38,18 +38,19 @@ var URL = require('url');
 var http = require('http');
 var dot_emc = require('dot-emc');
 var express = require('express');
-var favicon = require('static-favicon');
-var morgan_logger = require('morgan');
-var body_parser = require('body-parser');
-var cookie_parser = require('cookie-parser');
-var cookie_session = require('cookie-session');
-var method_override = require('method-override');
-var compression = require('compression');
+var express_favicon = require('static-favicon');
+var express_morgan_logger = require('morgan');
+var express_body_parser = require('body-parser');
+var express_cookie_parser = require('cookie-parser');
+var express_cookie_session = require('cookie-session');
+var express_method_override = require('method-override');
+var express_compress = require('compression');
 var fs = require('fs');
 // var mongoose = require('mongoose');
 // var passport = require('passport');
 // var passport_http = require('passport-http');
 
+var rootdir = path.join(__dirname, '..', '..');
 var dev_mode = (process.env.DEV_MODE === 'dev');
 var debug_mode = (process.env.DEBUG_MODE === 'true');
 
@@ -67,7 +68,7 @@ app.set('port', web_port);
 var dot_emc_app = dot_emc.init({
 	app: app
 });
-app.set('views', path.join(__dirname, '..', 'views'));
+app.set('views', path.join(rootdir, 'src', 'views'));
 app.engine('dot', dot_emc_app.__express);
 app.engine('html', dot_emc_app.__express);
 
@@ -97,8 +98,8 @@ passport.deserializeUser(function(user_data, done) {
 
 // configure app middleware handlers in the order to use them
 
-app.use(favicon(path.join(__dirname, '..', '..', 'images', 'ampbw.png')));
-app.use(morgan_logger());
+app.use(express_favicon(path.join(rootdir, 'images', 'ampbw.png')));
+app.use(express_morgan_logger());
 app.use(function(req, res, next) {
 	// HTTPS redirect:
 	var fwd_proto = req.get('X-Forwarded-Proto');
@@ -111,10 +112,10 @@ app.use(function(req, res, next) {
 	}
 	return next();
 });
-app.use(cookie_parser(process.env.COOKIE_SECRET));
-app.use(body_parser());
-app.use(method_override());
-app.use(cookie_session({
+app.use(express_cookie_parser(process.env.COOKIE_SECRET));
+app.use(express_body_parser());
+app.use(express_method_override());
+app.use(express_cookie_session({
 	// no need for secret since its signed by cookieParser
 	key: 'attached_session',
 	signed: false, // already signed by cookie_parser
@@ -127,7 +128,7 @@ app.use(cookie_session({
 }));
 // app.use(passport.initialize());
 // app.use(passport.session());
-app.use(compression());
+app.use(express_compress());
 
 
 ////////////
@@ -174,11 +175,11 @@ if (false && !debug_mode) {
 }
 
 
-app.use('/public/', express.static(path.join(__dirname, '..', '..', 'build')));
-app.use('/public/images/', express.static(path.join(__dirname, '..', '..', 'images')));
-app.use('/vendor/', express.static(path.join(__dirname, '..', '..', 'vendor')));
-app.use('/vendor/', express.static(path.join(__dirname, '..', '..', 'node_modules')));
-app.use('/vendor/', express.static(path.join(__dirname, '..', '..', 'bower_components')));
+app.use('/public/', express.static(path.join(rootdir, 'build', 'public')));
+app.use('/public/images/', express.static(path.join(rootdir, 'images')));
+app.use('/vendor/', express.static(path.join(rootdir, 'vendor')));
+app.use('/vendor/', express.static(path.join(rootdir, 'node_modules')));
+app.use('/vendor/', express.static(path.join(rootdir, 'bower_components')));
 
 
 // error handlers should be last

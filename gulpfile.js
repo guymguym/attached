@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var filter = require('gulp-filter');
 var less = require('gulp-less');
 var uglify = require('gulp-uglify');
 var minify_css = require('gulp-minify-css');
@@ -8,7 +9,9 @@ var jshint_stylish = require('jshint-stylish');
 var bower = require('gulp-bower');
 var browserify = require('gulp-browserify');
 var ng_template_cache = require('gulp-angular-templatecache');
-var nodemon = require('gulp-nodemon')
+var nodemon = require('gulp-nodemon');
+var es = require('event-stream');
+var gconcat = require('gulp-concat');
 
 var paths = {
 	css: './src/css/**/*',
@@ -16,79 +19,79 @@ var paths = {
 	scripts: ['./src/server/**/*', './src/client/**/*'],
 	server_main: './src/server/server.js',
 	client_main: './src/client/main.js',
+	client_externals: [
+		'./bower_components/alertify.js/lib/alertify.min.js',
+	]
 };
 
 gulp.task('bower', function() {
-	bower();
-	// .pipe(gulp.dest('build/bower'));
+	return bower();
 });
 
 gulp.task('css', function() {
-	gulp.src(paths.css)
+	return gulp.src(paths.css)
 		.pipe(less())
+		.pipe(rename('styles.css'))
+		.pipe(gulp.dest('build/public/css'))
 		.pipe(minify_css())
-		.pipe(gulp.dest('build/css'));
+		.pipe(rename('styles.min.css'))
+		.pipe(gulp.dest('build/public/css'));
 });
 
 gulp.task('jshint', function() {
-	gulp.src(paths.scripts)
+	return gulp.src(paths.scripts)
 		.pipe(jshint())
 		.pipe(jshint.reporter(jshint_stylish))
 		.pipe(jshint.reporter('fail'));
 });
 
+gulp.task('ng', function() {
+	return gulp.src(paths.views_ng)
+		.pipe(ng_template_cache())
+		.pipe(gulp.dest('build/'));
+});
+
 gulp.task('js', ['bower', 'jshint'], function() {
 	// single entry point to browserify
-	gulp.src(paths.client_main)
+	return es.merge(
+		gulp.src(paths.client_main)
 		.pipe(browserify({
 			insertGlobals: true,
 			debug: true
-		}))
+		})),
+		gulp.src(paths.client_externals)
+	).pipe(gconcat('bundle.js'))
+		.pipe(gulp.dest('build/public/js'))
 		.pipe(uglify())
-		.pipe(rename('bundle.js'))
-		.pipe(gulp.dest('build/js'));
-});
-
-gulp.task('ng', function() {
-	gulp.src(paths.views_ng)
-		.pipe(ng_template_cache())
-		.pipe(uglify())
-		.pipe(gulp.dest('build/js'));
+		.pipe(rename('bundle.min.js'))
+		.pipe(gulp.dest('build/public/js'));
 });
 
 
-gulp.task('install', [
-	'bower',
-	'css',
-	'jshint',
-	'js',
-	'ng'
-]);
+
+gulp.task('install', ['css', 'js']);
 
 
-// gulp.task('watch', function() {
-// gulp.watch(paths.scripts, ['jshint', 'js']);
-// gulp.watch(paths.css, ['css']);
-// gulp.watch(paths.client_main, ['js']);
-// gulp.watch(paths.views_ng, ['ng']);
-// });
+var nodemon_instance;
 
-gulp.task('nodemon', function() {
-	nodemon({
-		script: paths.server_main,
-		watch: 'src/',
-		ext: 'js less css html json',
-		ignore: ['.git'],
-		verbose: true,
-	}).on('change', 'install').on('restart', function() {
-		console.log('~~~ restart server ~~~')
-	})
+gulp.task('serve', ['install'], function() {
+	if (!nodemon_instance) {
+		nodemon_instance = nodemon({
+			script: paths.server_main,
+			watch: 'src/__manual_watch__/',
+			ext: '__manual_watch__',
+			verbose: true,
+		}).on('restart', function() {
+			console.log('~~~ restart server ~~~');
+		});
+	} else {
+		nodemon_instance.emit('restart');
+	}
 });
 
-gulp.task('start_dev', [
-	'install',
-	'nodemon'
-]);
+gulp.task('start_dev', ['serve'], function() {
+	return gulp.watch('src/**/*', ['serve']);
+});
 
 gulp.task('start_prod', function() {
 	console.log('~~~ START PROD ~~~');
