@@ -36,6 +36,9 @@ for (var i in dot.templateSettings) {
 var path = require('path');
 var URL = require('url');
 var http = require('http');
+var fs = require('fs');
+var util = require('util');
+var request = require('request');
 var dot_emc = require('dot-emc');
 var express = require('express');
 var express_favicon = require('static-favicon');
@@ -45,7 +48,6 @@ var express_cookie_parser = require('cookie-parser');
 var express_cookie_session = require('cookie-session');
 var express_method_override = require('method-override');
 var express_compress = require('compression');
-var fs = require('fs');
 // var mongoose = require('mongoose');
 // var passport = require('passport');
 // var passport_http = require('passport-http');
@@ -147,6 +149,37 @@ app.get('/logout', function(req, res) {
 	return res.redirect('/');
 });
 */
+
+app.get('/p64', function(req, res) {
+	return request({
+		method: 'GET',
+		url: req.query.url,
+		encoding: 'base64',
+	}, function(err, response, data) {
+		if (err) {
+			console.error('PROXY ERROR', err);
+			return res.send(500, 'PROXY ERROR');
+		}
+		if (response.statusCode !== 200) {
+			console.error('PROXY FAILED', response.statusCode);
+			return res.send(500, 'PROXY FAILED ' + response.statusCode);
+		}
+		var content_type = response.headers['content-type'];
+		console.log('proxy response', content_type, data.length);
+		var reply_script = 'window["' + req.query.callback + '"]' +
+			'("data:' + content_type + ';base64,' + data + '");';
+		res.setHeader('Content-Type', 'text/javascript');
+		res.send(200, reply_script);
+	});
+});
+
+app.get('/i64', function(req, res) {
+	var match = /data:([^;]*);base64,(.*)/.exec(req.query.q);
+	console.log('image response', match[1], match[2] && match[2].length);
+	res.setHeader('Content-Type', match[1]);
+	res.send(200, new Buffer(match[2], 'base64'));
+});
+
 
 app.get('/', function(req, res) {
 	return res.render('index.html', {
